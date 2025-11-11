@@ -48,7 +48,6 @@ export default function About() {
           </motion.p>
         </div>
       </section>
-
       <section className="py-20">
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto space-y-8">
@@ -59,7 +58,7 @@ export default function About() {
               viewport={{ once: true }}
               transition={{ duration: 0.6 }}
             >
-              <h2 className="text-3xl font-bold mb-4">Our Story</h2>
+              <h2 className="text-3xl font-bold mb-4 text-[#6f83e8]">Our Story</h2>
               <p className="text-muted-foreground leading-relaxed">
                 At Cosmic Pizza & Donair, we believe in creating more than just pizza – we create experiences.
                 Our journey began with a simple mission: to serve the best halal pizza and donair in Canada,
