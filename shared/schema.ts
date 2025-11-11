@@ -68,3 +68,25 @@ export interface Location {
   phone: string;
   hours: string;
 }
+
+export interface ProductVariation {
+  id: string;
+  name: string;
+  price: number;
+  currency: string;
+}
+
+export interface Product {
+  id: string;
+  name: string;
+  description: string;
+  category: string;
+  image: string;
+  variations: ProductVariation[];
+}
+
+export interface SquareProductsResponse {
+  success: boolean;
+  count: number;
+  products: Product[];
+}
