@@ -13,7 +13,7 @@ import bbqPizza from '@assets/generated_images/BBQ_Chicken_Pizza_bfbf1bea.png';
 import heroBackground from '@assets/generated_images/Pizza_hero_background_9183e00e.png';
 import buildPizzaImage from '@assets/generated_images/Premium_pizza_assembly_scene_5d570890.png';
 import heroImage1 from '@assets/stock_images/delicious_halal_pizz_186e8f7c.jpg';
-import heroImage2 from '@assets/stock_images/delicious_halal_pizz_5b84a5e7.jpg';
+import heroImage2 from '@assets/stock_images/cheese_pizza_close_u_d77835ee.jpg';
 import heroImage3 from '@assets/stock_images/delicious_halal_pizz_81f4cbd2.jpg';
 import heroImage4 from '@assets/stock_images/delicious_halal_pizz_0eab6829.jpg';
 
