@@ -11,10 +11,11 @@ import chickenPizza from '@assets/image_1762844821511.png';
 import veggiePizza from '@assets/image_1762844897590.png';
 import bbqPizza from '@assets/image_1762845157826.png';
 import margheritaPizza from '@assets/image_1762844795851.png';
-import heroBackground from '@assets/generated_images/Pizza_hero_background_9183e00e.png';
 import buildPizzaImage from '@assets/generated_images/Premium_pizza_assembly_scene_5d570890.png';
-import heroImage1 from '@assets/image_1762844645258.png';
-import heroImage2 from '@assets/image_1762844670234.png';
+import heroImage1 from '@assets/stock_images/delicious_fresh_hala_853e16eb.jpg';
+import heroImage2 from '@assets/stock_images/delicious_fresh_hala_9ee11a8e.jpg';
+import heroImage3 from '@assets/stock_images/delicious_fresh_hala_d48f153c.jpg';
+import heroImage4 from '@assets/stock_images/delicious_fresh_hala_113229da.jpg';
 
 export default function Home() {
   // TODO: Remove mock data - replace with API calls
@@ -74,7 +75,7 @@ export default function Home() {
         subtitle="100% Halal - We have the best combination and our specialty pizzas are the most selling pizzas. Try once and you will fall in love."
         ctaText="See Menu"
         ctaLink="/menu"
-        backgroundImages={[heroImage1, heroImage2]}
+        backgroundImages={[heroImage1, heroImage2, heroImage3, heroImage4]}
       />
 
       <FeatureSection features={features} />
