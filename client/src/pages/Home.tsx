@@ -75,7 +75,7 @@ export default function Home() {
 
       <PizzaTimeline />
 
-      <section className="py-20 bg-card/50">
+      <section className="py-20 bg-background">
         <div className="container mx-auto px-4">
           <motion.div 
             initial={{ opacity: 0, y: 20 }}
@@ -93,7 +93,7 @@ export default function Home() {
             </p>
           </motion.div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-8">
+          <div className="grid md:grid-cols-3 gap-6 mb-12">
             {featuredPizzas.map((pizza, index) => (
               <motion.div
                 key={pizza.id}
@@ -101,8 +101,17 @@ export default function Home() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.4, delay: index * 0.1 }}
+                className="group relative overflow-hidden rounded-lg"
               >
-                <PizzaCard {...pizza} />
+                <div className="aspect-square overflow-hidden rounded-lg">
+                  <motion.img
+                    src={pizza.image}
+                    alt={pizza.name}
+                    className="w-full h-full object-cover"
+                    whileHover={{ scale: 1.05 }}
+                    transition={{ duration: 0.4 }}
+                  />
+                </div>
               </motion.div>
             ))}
           </div>
