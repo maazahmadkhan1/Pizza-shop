@@ -7,9 +7,10 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Link } from "wouter";
 import PizzaCard from "@/components/PizzaCard";
 import { motion } from "framer-motion";
-import chickenPizza from '@assets/generated_images/Halal_Chicken_Special_Pizza_e83ceb00.png';
-import veggiePizza from '@assets/generated_images/Veggie_Lovers_Pizza_35627115.png';
-import bbqPizza from '@assets/generated_images/BBQ_Chicken_Pizza_bfbf1bea.png';
+import chickenPizza from '@assets/image_1762844821511.png';
+import veggiePizza from '@assets/image_1762844897590.png';
+import bbqPizza from '@assets/image_1762845157826.png';
+import margheritaPizza from '@assets/image_1762844795851.png';
 import heroBackground from '@assets/generated_images/Pizza_hero_background_9183e00e.png';
 import buildPizzaImage from '@assets/generated_images/Premium_pizza_assembly_scene_5d570890.png';
 import heroImage1 from '@assets/image_1762844645258.png';
@@ -19,23 +20,30 @@ export default function Home() {
   // TODO: Remove mock data - replace with API calls
   const featuredPizzas = [
     {
-      id: 'halal-chicken',
-      name: 'Halal Chicken Special',
-      description: 'Grilled halal chicken, mushrooms, onions, and green peppers with our signature sauce.',
-      price: 17,
+      id: 'margherita',
+      name: 'Margherita Classic',
+      description: 'Fresh mozzarella, tomato sauce, and basil. Simple yet perfect traditional Italian pizza.',
+      price: 14,
+      image: margheritaPizza
+    },
+    {
+      id: 'cheese-stretch',
+      name: 'Ultimate Cheese',
+      description: 'Loaded with premium mozzarella and cheddar. Experience the ultimate cheese pull!',
+      price: 16,
       image: chickenPizza
     },
     {
-      id: 'veggie-lovers',
-      name: 'Veggie Lovers',
-      description: 'Fresh mushrooms, tomatoes, onions, green peppers, and black olives. Vegetarian delight!',
+      id: 'mushroom-olive',
+      name: 'Mushroom & Olive',
+      description: 'Fresh mushrooms and black olives on our signature sauce. A savory vegetarian favorite.',
       price: 15,
       image: veggiePizza
     },
     {
-      id: 'bbq-chicken',
-      name: 'BBQ Chicken',
-      description: 'Halal chicken with BBQ sauce, red onions, and mozzarella. Sweet and savory perfection.',
+      id: 'bbq-pineapple',
+      name: 'BBQ Hawaiian',
+      description: 'Halal chicken with BBQ sauce and pineapple. Sweet and tangy perfection.',
       price: 17,
       image: bbqPizza
     }
