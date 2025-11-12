@@ -158,12 +158,12 @@ export default function PizzaPreview({ size, crust, sauce, cheese, toppings }: P
               width: `${crustThickness * 100}%`,
               height: `${crustThickness * 100}%`,
               background: cheese === "regular"
-                ? "radial-gradient(circle at 45% 40%, rgba(255, 250, 230, 0.9), rgba(255, 245, 215, 0.85) 40%, rgba(255, 235, 190, 0.8) 75%)"
+                ? "radial-gradient(circle at 45% 40%, rgba(255, 250, 230, 0.5), rgba(255, 245, 215, 0.45) 40%, rgba(255, 235, 190, 0.4) 75%)"
                 : cheese === "extra"
-                ? "radial-gradient(circle at 45% 40%, rgba(255, 250, 230, 0.95), rgba(255, 245, 215, 0.92) 40%, rgba(255, 235, 190, 0.9) 75%)"
-                : cheese === "light"
                 ? "radial-gradient(circle at 45% 40%, rgba(255, 250, 230, 0.7), rgba(255, 245, 215, 0.65) 40%, rgba(255, 235, 190, 0.6) 75%)"
-                : "radial-gradient(circle at 45% 40%, rgba(255, 250, 230, 0.9), rgba(255, 245, 215, 0.85) 40%, rgba(255, 235, 190, 0.8) 75%)",
+                : cheese === "light"
+                ? "radial-gradient(circle at 45% 40%, rgba(255, 250, 230, 0.35), rgba(255, 245, 215, 0.3) 40%, rgba(255, 235, 190, 0.25) 75%)"
+                : "radial-gradient(circle at 45% 40%, rgba(255, 250, 230, 0.5), rgba(255, 245, 215, 0.45) 40%, rgba(255, 235, 190, 0.4) 75%)",
             }}
           />
         )}
