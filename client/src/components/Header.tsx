@@ -1,13 +1,16 @@
 import { Link, useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
-import { Menu, X, Moon, Sun } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Menu, X, Moon, Sun, ShoppingCart } from "lucide-react";
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useCart } from "@/hooks/use-cart";
 
 export default function Header() {
   const [location] = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [theme, setTheme] = useState<'dark' | 'light'>('dark');
+  const { itemCount, toggleCart } = useCart();
 
   const toggleTheme = () => {
     const newTheme = theme === 'dark' ? 'light' : 'dark';
@@ -74,6 +77,24 @@ export default function Header() {
               data-testid="button-theme-toggle"
             >
               {theme === 'dark' ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={toggleCart}
+              className="relative"
+              data-testid="button-cart"
+            >
+              <ShoppingCart className="h-5 w-5" />
+              {itemCount > 0 && (
+                <Badge
+                  variant="destructive"
+                  className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center p-0 text-xs"
+                  data-testid="badge-cart-count"
+                >
+                  {itemCount}
+                </Badge>
+              )}
             </Button>
             <Button
               className="hidden md:inline-flex"
