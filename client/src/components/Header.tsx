@@ -1,5 +1,10 @@
 import { Link, useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Menu, X, Moon, Sun, ShoppingCart } from "lucide-react";
+import { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { useCart } from "@/hooks/use-cart";
 import { Menu, X, Moon, Sun, User, LogOut } from "lucide-react";
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -17,9 +22,10 @@ import {
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 
 export default function Header() {
-  const [location] = useLocation();
+  const [location, navigate] = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [theme, setTheme] = useState<'dark' | 'light'>('dark');
+  const { itemCount, toggleCart, openCart } = useCart();
   const [signInOpen, setSignInOpen] = useState(false);
   const [signUpOpen, setSignUpOpen] = useState(false);
   const { currentUser, logout } = useAuth();
@@ -29,6 +35,14 @@ export default function Header() {
     setTheme(newTheme);
     document.documentElement.classList.toggle('dark');
     console.log('Theme toggled to:', newTheme);
+  };
+
+  const handleOrderNow = () => {
+    if (itemCount > 0) {
+      navigate('/checkout');
+    } else {
+      openCart();
+    }
   };
 
   const navItems = [
@@ -89,6 +103,30 @@ export default function Header() {
               data-testid="button-theme-toggle"
             >
               {theme === 'dark' ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={toggleCart}
+              className="relative"
+              data-testid="button-cart"
+            >
+              <ShoppingCart className="h-5 w-5" />
+              {itemCount > 0 && (
+                <span
+                  className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center rounded-full bg-primary text-primary-foreground text-xs font-semibold"
+                  data-testid="badge-cart-count"
+                >
+                  {itemCount}
+                </span>
+              )}
+            </Button>
+            <Button
+              className="hidden md:inline-flex"
+              onClick={handleOrderNow}
+              data-testid="button-order-now"
+            >
+              Order Now
             </Button>
             
             {currentUser ? (
@@ -192,6 +230,16 @@ export default function Header() {
                 exit={{ opacity: 0, x: -20 }}
                 transition={{ duration: 0.2, delay: navItems.length * 0.05 }}
               >
+                <Button 
+                  className="w-full" 
+                  onClick={() => {
+                    handleOrderNow();
+                    setMobileMenuOpen(false);
+                  }}
+                  data-testid="button-mobile-order"
+                >
+                  Order Now
+                </Button>
                 {currentUser ? (
                   <>
                     <Button className="w-full mb-2" data-testid="button-mobile-order">

@@ -122,45 +122,51 @@ export default function PizzaPreview({ size, crust, sauce, cheese, toppings }: P
           background: "radial-gradient(circle at 40% 35%, #E8C7A0, #D4A574 30%, #C19A6B 55%, #A8875A 80%, #8B7043)",
         }}
       >
-        {/* Sauce layer - always visible */}
-        <motion.div
-          key={`sauce-${sauce}`}
-          initial={{ scale: 0, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          transition={{ type: "spring", stiffness: 200, damping: 15, delay: 0.3 }}
-          className="absolute rounded-full"
-          style={{
-            width: `${crustThickness * 100}%`,
-            height: `${crustThickness * 100}%`,
-            background: sauce.includes("tomato") 
-              ? "radial-gradient(circle at 45% 40%, #E74C3C, #C0392B 60%, #A93226 85%)"
-              : sauce.includes("bbq")
-              ? "radial-gradient(circle at 45% 40%, #8B4513, #654321 60%, #4A2511 85%)"
-              : sauce.includes("white")
-              ? "radial-gradient(circle at 45% 40%, #F5F5DC, #E8E0C8 60%, #D4CDB0 85%)"
-              : "radial-gradient(circle at 45% 40%, #E74C3C, #C0392B 60%, #A93226 85%)",
-          }}
-        />
+        {/* Sauce layer - conditionally visible */}
+        {sauce !== "none" && (
+          <motion.div
+            key={`sauce-${sauce}`}
+            initial={{ scale: 0, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ type: "spring", stiffness: 200, damping: 15, delay: 0.3 }}
+            className="absolute rounded-full"
+            style={{
+              width: `${crustThickness * 100}%`,
+              height: `${crustThickness * 100}%`,
+              background: sauce === "marinara"
+                ? "radial-gradient(circle at 45% 40%, #E74C3C, #C0392B 60%, #A93226 85%)"
+                : sauce === "bbq"
+                ? "radial-gradient(circle at 45% 40%, #8B4513, #654321 60%, #4A2511 85%)"
+                : sauce === "white"
+                ? "radial-gradient(circle at 45% 40%, #F5F5DC, #E8E0C8 60%, #D4CDB0 85%)"
+                : sauce === "pesto"
+                ? "radial-gradient(circle at 45% 40%, #6B8E23, #556B2F 60%, #3D4F1F 85%)"
+                : "radial-gradient(circle at 45% 40%, #E74C3C, #C0392B 60%, #A93226 85%)",
+            }}
+          />
+        )}
 
-        {/* Cheese layer - always visible */}
-        <motion.div
-          key={`cheese-${cheese}`}
-          initial={{ scale: 0, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          transition={{ type: "spring", stiffness: 200, damping: 15, delay: 0.6 }}
-          className="absolute rounded-full"
-          style={{
-            width: `${crustThickness * 100}%`,
-            height: `${crustThickness * 100}%`,
-            background: cheese.includes("mozzarella")
-              ? "radial-gradient(circle at 45% 40%, rgba(255, 250, 230, 0.9), rgba(255, 245, 215, 0.85) 40%, rgba(255, 235, 190, 0.8) 75%)"
-              : cheese.includes("cheddar")
-              ? "radial-gradient(circle at 45% 40%, rgba(255, 200, 100, 0.9), rgba(255, 180, 80, 0.85) 40%, rgba(255, 160, 60, 0.8) 75%)"
-              : cheese.includes("parmesan")
-              ? "radial-gradient(circle at 45% 40%, rgba(255, 255, 220, 0.9), rgba(255, 250, 200, 0.85) 40%, rgba(255, 240, 180, 0.8) 75%)"
-              : "radial-gradient(circle at 45% 40%, rgba(255, 250, 230, 0.9), rgba(255, 245, 215, 0.85) 40%, rgba(255, 235, 190, 0.8) 75%)",
-          }}
-        />
+        {/* Cheese layer - conditionally visible */}
+        {cheese !== "none" && (
+          <motion.div
+            key={`cheese-${cheese}`}
+            initial={{ scale: 0, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ type: "spring", stiffness: 200, damping: 15, delay: 0.6 }}
+            className="absolute rounded-full"
+            style={{
+              width: `${crustThickness * 100}%`,
+              height: `${crustThickness * 100}%`,
+              background: cheese === "regular"
+                ? "radial-gradient(circle at 45% 40%, rgba(255, 250, 230, 0.5), rgba(255, 245, 215, 0.45) 40%, rgba(255, 235, 190, 0.4) 75%)"
+                : cheese === "extra"
+                ? "radial-gradient(circle at 45% 40%, rgba(255, 250, 230, 0.7), rgba(255, 245, 215, 0.65) 40%, rgba(255, 235, 190, 0.6) 75%)"
+                : cheese === "light"
+                ? "radial-gradient(circle at 45% 40%, rgba(255, 250, 230, 0.35), rgba(255, 245, 215, 0.3) 40%, rgba(255, 235, 190, 0.25) 75%)"
+                : "radial-gradient(circle at 45% 40%, rgba(255, 250, 230, 0.5), rgba(255, 245, 215, 0.45) 40%, rgba(255, 235, 190, 0.4) 75%)",
+            }}
+          />
+        )}
 
         {/* Toppings */}
         {toppings.map((toppingId, index) => {
