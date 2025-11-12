@@ -26,7 +26,7 @@ export default function Menu() {
   const products = productsData?.products || [];
   
   const categories = useMemo(() => {
-    const cats = new Set(products.map(p => p.category));
+    const cats = new Set(products.map(p => p.category).filter(Boolean));
     return Array.from(cats);
   }, [products]);
 
@@ -38,16 +38,18 @@ export default function Menu() {
   }, [products, selectedCategory]);
 
   const getCategorySlug = (category: string): string => {
+    if (!category) return 'uncategorized';
     return category.toLowerCase().replace(/\s+/g, '-');
   };
 
   const productsByCategory = useMemo(() => {
     const grouped: Record<string, Product[]> = {};
     products.forEach(product => {
-      if (!grouped[product.category]) {
-        grouped[product.category] = [];
+      const category = product.category || 'Uncategorized';
+      if (!grouped[category]) {
+        grouped[category] = [];
       }
-      grouped[product.category].push(product);
+      grouped[category].push(product);
     });
     return grouped;
   }, [products]);
