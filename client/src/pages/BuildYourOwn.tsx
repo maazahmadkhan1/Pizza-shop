@@ -93,7 +93,6 @@ export default function BuildYourOwn() {
       id: `custom-${Date.now()}`,
       name: 'Custom Pizza',
       price: calculateTotal(),
-      quantity: 1,
       size: selectedSizeObj?.name,
       customizations: {
         crust: selectedCrustObj?.name,

@@ -80,6 +80,7 @@ export interface CartItem {
   customizations?: {
     crust?: string;
     sauce?: string;
+    cheese?: string;
     toppings?: string[];
   };
 }

@@ -109,6 +109,9 @@ export function CartPopup() {
                                   {item.customizations.sauce && (
                                     <p>Sauce: {item.customizations.sauce}</p>
                                   )}
+                                  {item.customizations.cheese && (
+                                    <p>Cheese: {item.customizations.cheese}</p>
+                                  )}
                                   {item.customizations.toppings && item.customizations.toppings.length > 0 && (
                                     <p>Toppings: {item.customizations.toppings.join(', ')}</p>
                                   )}
