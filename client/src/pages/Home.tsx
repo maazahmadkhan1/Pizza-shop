@@ -9,7 +9,6 @@ import PizzaCard from "@/components/PizzaCard";
 import { motion } from "framer-motion";
 import chickenPizza from '@assets/image_1762844821511.png';
 import veggiePizza from '@assets/image_1762844897590.png';
-import bbqPizza from '@assets/image_1762845157826.png';
 import margheritaPizza from '@assets/image_1762844795851.png';
 import buildPizzaImage from '@assets/generated_images/Premium_pizza_assembly_scene_5d570890.png';
 import heroImage1 from '@assets/stock_images/delicious_fresh_hala_853e16eb.jpg';
@@ -40,13 +39,6 @@ export default function Home() {
       description: 'Fresh mushrooms and black olives on our signature sauce. A savory vegetarian favorite.',
       price: 15,
       image: veggiePizza
-    },
-    {
-      id: 'bbq-pineapple',
-      name: 'BBQ Hawaiian',
-      description: 'Halal chicken with BBQ sauce and pineapple. Sweet and tangy perfection.',
-      price: 17,
-      image: bbqPizza
     }
   ];
 
