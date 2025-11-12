@@ -15,6 +15,7 @@ import About from "@/pages/About";
 import Ingredients from "@/pages/Ingredients";
 import Contact from "@/pages/Contact";
 import Checkout from "@/pages/Checkout";
+import OrderConfirmation from "@/pages/OrderConfirmation";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -38,6 +39,7 @@ function Router() {
           <Route path="/ingredients" component={Ingredients} />
           <Route path="/contact" component={Contact} />
           <Route path="/checkout" component={Checkout} />
+          <Route path="/order-confirmation" component={OrderConfirmation} />
           <Route component={NotFound} />
         </Switch>
       </motion.div>

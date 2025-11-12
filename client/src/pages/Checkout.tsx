@@ -47,7 +47,7 @@ const storeLocations: Location[] = [
 ];
 
 export default function Checkout() {
-  const { items, subtotal, clearCart } = useCart();
+  const { items, subtotal, clearCart, setLastOrder } = useCart();
   const { toast } = useToast();
   const [, setLocation] = useLocation();
 
@@ -67,6 +67,12 @@ export default function Checkout() {
 
   const deliveryFee = deliveryMethod === 'delivery' ? 5.99 : 0;
   const total = subtotal + deliveryFee;
+
+  const generateOrderNumber = () => {
+    const timestamp = Date.now().toString().slice(-8);
+    const random = Math.random().toString(36).substring(2, 6).toUpperCase();
+    return `CP${timestamp}${random}`;
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -105,18 +111,33 @@ export default function Checkout() {
     }
 
     setTimeout(() => {
-      toast({
-        title: 'Order Confirmed!',
-        description: `Your order has been placed successfully. ${
-          deliveryMethod === 'pickup'
-            ? 'We will notify you when it\'s ready for pickup.'
-            : 'Your pizza will be delivered soon!'
-        }`,
-      });
+      const orderData = {
+        orderNumber: generateOrderNumber(),
+        items: [...items],
+        subtotal,
+        deliveryFee,
+        total,
+        deliveryMethod,
+        paymentMethod,
+        timestamp: new Date(),
+        ...(deliveryMethod === 'delivery' 
+          ? { deliveryAddress: { ...deliveryAddress } }
+          : { 
+              pickupLocation: storeLocations.find(loc => loc.id === selectedLocation) 
+                ? {
+                    id: selectedLocation,
+                    name: storeLocations.find(loc => loc.id === selectedLocation)!.name,
+                    address: storeLocations.find(loc => loc.id === selectedLocation)!.address,
+                  }
+                : undefined
+            }
+        ),
+      };
       
+      setLastOrder(orderData);
       clearCart();
       setIsSubmitting(false);
-      setLocation('/');
+      setLocation('/order-confirmation');
     }, 1500);
   };
 
@@ -318,86 +339,73 @@ export default function Checkout() {
                       </div>
                     </CardContent>
                   </Card>
-
-                  <Card className="mt-6">
-                    <CardHeader>
-                      <CardTitle className="flex items-center gap-2">
-                        <Wallet className="h-5 w-5" />
-                        Payment Method
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <RadioGroup
-                        value={paymentMethod}
-                        onValueChange={(value) => setPaymentMethod(value as PaymentMethod)}
-                      >
-                        <div className="flex items-start space-x-3 p-4 rounded-md border hover-elevate">
-                          <RadioGroupItem value="cash" id="cash" data-testid="radio-cash" />
-                          <Label htmlFor="cash" className="flex-1 cursor-pointer">
-                            <div className="flex items-center gap-2 mb-1">
-                              <Wallet className="h-4 w-4" />
-                              <span className="font-semibold">Cash on Delivery</span>
-                            </div>
-                            <p className="text-sm text-muted-foreground">
-                              Pay with cash when your order arrives
-                            </p>
-                          </Label>
-                        </div>
-
-                        <div className="flex items-start space-x-3 p-4 rounded-md border hover-elevate">
-                          <RadioGroupItem value="card" id="card" data-testid="radio-card" />
-                          <Label htmlFor="card" className="flex-1 cursor-pointer">
-                            <div className="flex items-center gap-2 mb-1">
-                              <CreditCard className="h-4 w-4" />
-                              <span className="font-semibold">Credit/Debit Card</span>
-                            </div>
-                            <p className="text-sm text-muted-foreground">
-                              Pay securely with your card
-                            </p>
-                          </Label>
-                        </div>
-                      </RadioGroup>
-
-                      {paymentMethod === 'card' && (
-                        <motion.div
-                          initial={{ opacity: 0, height: 0 }}
-                          animate={{ opacity: 1, height: 'auto' }}
-                          className="mt-4"
-                        >
-                          <Label htmlFor="cardNumber">Card Number</Label>
-                          <Input
-                            id="cardNumber"
-                            type="text"
-                            placeholder="1234 5678 9012 3456"
-                            value={cardNumber}
-                            onChange={(e) => setCardNumber(e.target.value)}
-                            maxLength={19}
-                            data-testid="input-card-number"
-                          />
-                        </motion.div>
-                      )}
-                    </CardContent>
-                  </Card>
                 </motion.div>
               )}
 
-              {deliveryMethod === 'pickup' && (
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <Wallet className="h-5 w-5" />
-                      Payment Method
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="p-4 rounded-md bg-muted">
-                      <p className="text-sm text-muted-foreground">
-                        Pay at the store when you pick up your order
-                      </p>
+              <Card className="mt-6">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Wallet className="h-5 w-5" />
+                    Payment Method
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <RadioGroup
+                    value={paymentMethod}
+                    onValueChange={(value) => setPaymentMethod(value as PaymentMethod)}
+                  >
+                    <div className="flex items-start space-x-3 p-4 rounded-md border hover-elevate">
+                      <RadioGroupItem value="cash" id="cash" data-testid="radio-cash" />
+                      <Label htmlFor="cash" className="flex-1 cursor-pointer">
+                        <div className="flex items-center gap-2 mb-1">
+                          <Wallet className="h-4 w-4" />
+                          <span className="font-semibold">
+                            {deliveryMethod === 'delivery' ? 'Cash on Delivery' : 'Cash at Pickup'}
+                          </span>
+                        </div>
+                        <p className="text-sm text-muted-foreground">
+                          {deliveryMethod === 'delivery' 
+                            ? 'Pay with cash when your order arrives'
+                            : 'Pay with cash when you pick up your order'
+                          }
+                        </p>
+                      </Label>
                     </div>
-                  </CardContent>
-                </Card>
-              )}
+
+                    <div className="flex items-start space-x-3 p-4 rounded-md border hover-elevate">
+                      <RadioGroupItem value="card" id="card" data-testid="radio-card" />
+                      <Label htmlFor="card" className="flex-1 cursor-pointer">
+                        <div className="flex items-center gap-2 mb-1">
+                          <CreditCard className="h-4 w-4" />
+                          <span className="font-semibold">Credit/Debit Card</span>
+                        </div>
+                        <p className="text-sm text-muted-foreground">
+                          Pay securely with your card
+                        </p>
+                      </Label>
+                    </div>
+                  </RadioGroup>
+
+                  {paymentMethod === 'card' && (
+                    <motion.div
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: 'auto' }}
+                      className="mt-4"
+                    >
+                      <Label htmlFor="cardNumber">Card Number</Label>
+                      <Input
+                        id="cardNumber"
+                        type="text"
+                        placeholder="1234 5678 9012 3456"
+                        value={cardNumber}
+                        onChange={(e) => setCardNumber(e.target.value)}
+                        maxLength={19}
+                        data-testid="input-card-number"
+                      />
+                    </motion.div>
+                  )}
+                </CardContent>
+              </Card>
             </div>
 
             <div className="md:col-span-1">

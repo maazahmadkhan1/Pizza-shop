@@ -1,9 +1,32 @@
 import { createContext, useContext, useReducer, ReactNode } from 'react';
-import type { CartItem } from '@shared/schema';
+import type { CartItem, DeliveryMethod, PaymentMethod } from '@shared/schema';
+
+export interface OrderData {
+  orderNumber: string;
+  items: CartItem[];
+  subtotal: number;
+  deliveryFee: number;
+  total: number;
+  deliveryMethod: DeliveryMethod;
+  paymentMethod: PaymentMethod;
+  deliveryAddress?: {
+    street: string;
+    city: string;
+    zip: string;
+    phone: string;
+  };
+  pickupLocation?: {
+    id: string;
+    name: string;
+    address: string;
+  };
+  timestamp: Date;
+}
 
 interface CartState {
   items: CartItem[];
   isOpen: boolean;
+  lastOrder: OrderData | null;
 }
 
 type CartAction =
@@ -13,7 +36,8 @@ type CartAction =
   | { type: 'CLEAR_CART' }
   | { type: 'TOGGLE_CART' }
   | { type: 'OPEN_CART' }
-  | { type: 'CLOSE_CART' };
+  | { type: 'CLOSE_CART' }
+  | { type: 'SET_ORDER'; order: OrderData };
 
 interface CartContextType extends CartState {
   addItem: (item: Omit<CartItem, 'quantity'>) => void;
@@ -23,6 +47,7 @@ interface CartContextType extends CartState {
   toggleCart: () => void;
   openCart: () => void;
   closeCart: () => void;
+  setLastOrder: (order: OrderData) => void;
   itemCount: number;
   subtotal: number;
 }
@@ -98,6 +123,12 @@ function cartReducer(state: CartState, action: CartAction): CartState {
         isOpen: false,
       };
     
+    case 'SET_ORDER':
+      return {
+        ...state,
+        lastOrder: action.order,
+      };
+    
     default:
       return state;
   }
@@ -107,6 +138,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const [state, dispatch] = useReducer(cartReducer, {
     items: [],
     isOpen: false,
+    lastOrder: null,
   });
 
   const addItem = (item: Omit<CartItem, 'quantity'>) => {
@@ -140,6 +172,10 @@ export function CartProvider({ children }: { children: ReactNode }) {
     dispatch({ type: 'CLOSE_CART' });
   };
 
+  const setLastOrder = (order: OrderData) => {
+    dispatch({ type: 'SET_ORDER', order });
+  };
+
   const itemCount = state.items.reduce((sum, item) => sum + item.quantity, 0);
   const subtotal = state.items.reduce((sum, item) => sum + item.price * item.quantity, 0);
 
@@ -154,6 +190,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
         toggleCart,
         openCart,
         closeCart,
+        setLastOrder,
         itemCount,
         subtotal,
       }}
