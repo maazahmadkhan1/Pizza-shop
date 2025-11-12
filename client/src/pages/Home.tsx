@@ -39,8 +39,39 @@ export default function Home() {
       description: 'Fresh mushrooms and black olives on our signature sauce. A savory vegetarian favorite.',
       price: 15,
       image: veggiePizza
+import { useQuery } from "@tanstack/react-query";
+import type { SquareProductsResponse } from "@shared/schema";
+import buildPizzaImage from '@assets/generated_images/Premium_pizza_assembly_scene_5d570890.png';
+import heroImage1 from '@assets/stock_images/delicious_halal_pizz_186e8f7c.jpg';
+import heroImage2 from '@assets/stock_images/delicious_halal_pizz_5b84a5e7.jpg';
+import heroImage3 from '@assets/stock_images/delicious_halal_pizz_81f4cbd2.jpg';
+import heroImage4 from '@assets/stock_images/delicious_halal_pizz_0eab6829.jpg';
+import houseSpecial from '@assets/generated_images/House_Special_Pizza_e0ab3d75.png';
+
+const FIREBASE_PRODUCTS_URL = 'https://us-central1-pizza-shop-3afe9.cloudfunctions.net/getSquareProducts';
+
+export default function Home() {
+  const { data: productsData, isLoading } = useQuery<SquareProductsResponse>({
+    queryKey: ['products'],
+    queryFn: async () => {
+      const response = await fetch(FIREBASE_PRODUCTS_URL);
+      if (!response.ok) {
+        throw new Error('Failed to fetch products');
+      }
+      return response.json();
     }
-  ];
+  });
+
+  const featuredPizzas = productsData?.products
+    .filter(p => p.category === 'Specialty Pizzas')
+    .slice(0, 2)
+    .map(p => ({
+      id: p.id,
+      name: p.name,
+      description: p.description,
+      price: p.variations[0]?.price || 0,
+      image: p.image || houseSpecial
+    })) || [];
 
   const features = [
     {
@@ -92,27 +123,36 @@ export default function Home() {
             </p>
           </motion.div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-8">
-            {featuredPizzas.map((pizza, index) => (
-              <motion.div
-                key={pizza.id}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.4, delay: index * 0.1 }}
-              >
-                <PizzaCard {...pizza} />
-              </motion.div>
-            ))}
-          </div>
+          {isLoading ? (
+            <div className="text-center py-12">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+              <p className="text-muted-foreground">Loading fresh menu items...</p>
+            </div>
+          ) : (
+            <>
+              <div className="grid md:grid-cols-2 gap-8 mb-8 max-w-5xl mx-auto">
+                {featuredPizzas.map((pizza, index) => (
+                  <motion.div
+                    key={pizza.id}
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.4, delay: index * 0.1 }}
+                  >
+                    <PizzaCard {...pizza} />
+                  </motion.div>
+                ))}
+              </div>
 
-          <div className="text-center">
-            <Link href="/menu">
-              <Button size="lg" data-testid="button-view-full-menu">
-                View Full Menu
-              </Button>
-            </Link>
-          </div>
+              <div className="text-center">
+                <Link href="/menu">
+                  <Button size="lg" data-testid="button-view-full-menu">
+                    View Full Menu
+                  </Button>
+                </Link>
+              </div>
+            </>
+          )}
         </div>
       </section>
 

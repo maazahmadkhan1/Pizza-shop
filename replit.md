@@ -85,15 +85,32 @@ Preferred communication style: Simple, everyday language.
 ### Authentication and Authorization
 
 **Current Implementation**
-- User schema defined in `shared/schema.ts` with username/password fields
-- Storage interface includes methods: `getUser()`, `getUserByUsername()`, `createUser()`
-- Session management configured via `connect-pg-simple` (installed but not implemented)
-- No active authentication flow currently implemented
+- **Firebase Authentication** integrated for user authentication
+- **Firebase SDK** (`firebase` package) configured in `client/src/lib/firebase.ts`
+- **AuthContext** (`client/src/contexts/AuthContext.tsx`) provides authentication state and methods across the app
+- Sign in/Sign up functionality with:
+  - Email and password authentication
+  - Google OAuth login via popup
+- Authentication state management via Firebase's `onAuthStateChanged` listener
+- Header component includes Sign In/Sign Up buttons (when logged out) and user menu with avatar (when logged in)
+- Mobile-responsive authentication UI with dialogs for sign in/sign up flows
 
-**Planned Architecture**
-- Session-based authentication using Express sessions
-- Password hashing expected (bcrypt or similar)
-- Cookie-based session storage with PostgreSQL backend
+**Firebase Configuration**
+- Requires environment variables: `VITE_FIREBASE_API_KEY`, `VITE_FIREBASE_APP_ID`, `VITE_FIREBASE_PROJECT_ID`
+- Firebase config file prevents duplicate initialization during hot reload
+- Storage bucket configured to use standard `appspot.com` domain
+
+**Authentication Features**
+- SignInDialog component with email/password and Google login
+- SignUpDialog component with:
+  - First name and last name fields
+  - Email and password registration
+  - Password confirmation
+  - User profile creation with display name (firstName + lastName)
+- User dropdown menu in header with profile access and sign out
+- Toast notifications for success/error feedback
+- Form validation (password length, matching passwords, required fields)
+- Console logging of user information (UUID, first name, last name, email, display name) on signup and authentication state changes
 
 ### External Dependencies
 
@@ -105,6 +122,11 @@ Preferred communication style: Simple, everyday language.
 - **cmdk**: Command palette component
 - **date-fns**: Date manipulation and formatting
 - **Embla Carousel**: Carousel/slider functionality
+
+**Authentication**
+- **Firebase**: Authentication SDK for email/password and Google OAuth login
+- Firebase initialized in `client/src/lib/firebase.ts` with config from environment variables
+- AuthContext provides authentication methods: `signup`, `login`, `loginWithGoogle`, `logout`
 
 **Form Handling**
 - **React Hook Form**: Form state management

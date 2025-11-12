@@ -6,6 +6,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { AnimatePresence, motion } from "framer-motion";
 import { CartProvider } from "@/hooks/use-cart";
 import { CartPopup } from "@/components/CartPopup";
+import { AuthProvider } from "@/contexts/AuthContext";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import Home from "@/pages/Home";
@@ -52,6 +53,8 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
         <CartProvider>
+      <AuthProvider>
+        <TooltipProvider>
           <div className="flex flex-col min-h-screen">
             <Header />
             <main className="flex-1">
@@ -63,6 +66,9 @@ function App() {
           <Toaster />
         </CartProvider>
       </TooltipProvider>
+          <Toaster />
+        </TooltipProvider>
+      </AuthProvider>
     </QueryClientProvider>
   );
 }

@@ -108,4 +108,24 @@ export interface Order {
   total: number;
   status: 'pending' | 'confirmed' | 'preparing' | 'ready' | 'completed';
   createdAt: Date;
+export interface ProductVariation {
+  id: string;
+  name: string;
+  price: number;
+  currency: string;
+}
+
+export interface Product {
+  id: string;
+  name: string;
+  description: string;
+  category: string;
+  image: string;
+  variations: ProductVariation[];
+}
+
+export interface SquareProductsResponse {
+  success: boolean;
+  count: number;
+  products: Product[];
 }

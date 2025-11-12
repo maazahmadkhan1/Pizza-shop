@@ -5,12 +5,30 @@ import { Menu, X, Moon, Sun, ShoppingCart } from "lucide-react";
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useCart } from "@/hooks/use-cart";
+import { Menu, X, Moon, Sun, User, LogOut } from "lucide-react";
+import { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { useAuth } from "@/contexts/AuthContext";
+import SignInDialog from "@/components/SignInDialog";
+import SignUpDialog from "@/components/SignUpDialog";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 
 export default function Header() {
   const [location, navigate] = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [theme, setTheme] = useState<'dark' | 'light'>('dark');
   const { itemCount, toggleCart, openCart } = useCart();
+  const [signInOpen, setSignInOpen] = useState(false);
+  const [signUpOpen, setSignUpOpen] = useState(false);
+  const { currentUser, logout } = useAuth();
 
   const toggleTheme = () => {
     const newTheme = theme === 'dark' ? 'light' : 'dark';
@@ -110,6 +128,61 @@ export default function Header() {
             >
               Order Now
             </Button>
+            
+            {currentUser ? (
+              <>
+                <Button
+                  className="hidden md:inline-flex"
+                  data-testid="button-order-now"
+                >
+                  Order Now
+                </Button>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" size="icon" className="hidden md:inline-flex">
+                      <Avatar className="h-8 w-8">
+                        <AvatarFallback>
+                          {currentUser.email?.charAt(0).toUpperCase() || 'U'}
+                        </AvatarFallback>
+                      </Avatar>
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end">
+                    <DropdownMenuLabel>
+                      {currentUser.email}
+                    </DropdownMenuLabel>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem>
+                      <User className="mr-2 h-4 w-4" />
+                      Profile
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={logout}>
+                      <LogOut className="mr-2 h-4 w-4" />
+                      Sign Out
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </>
+            ) : (
+              <>
+                <Button
+                  variant="ghost"
+                  className="hidden md:inline-flex"
+                  onClick={() => setSignInOpen(true)}
+                  data-testid="button-sign-in"
+                >
+                  Sign In
+                </Button>
+                <Button
+                  className="hidden md:inline-flex"
+                  onClick={() => setSignUpOpen(true)}
+                  data-testid="button-sign-up"
+                >
+                  Sign Up
+                </Button>
+              </>
+            )}
+            
             <Button
               variant="ghost"
               size="icon"
@@ -167,11 +240,67 @@ export default function Header() {
                 >
                   Order Now
                 </Button>
+                {currentUser ? (
+                  <>
+                    <Button className="w-full mb-2" data-testid="button-mobile-order">
+                      Order Now
+                    </Button>
+                    <div className="w-full p-4 bg-secondary rounded-md">
+                      <p className="text-sm text-muted-foreground mb-2">Signed in as</p>
+                      <p className="text-sm font-medium mb-3">{currentUser.email}</p>
+                      <Button variant="outline" className="w-full" onClick={logout}>
+                        <LogOut className="mr-2 h-4 w-4" />
+                        Sign Out
+                      </Button>
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <Button 
+                      variant="outline" 
+                      className="w-full mb-2" 
+                      onClick={() => {
+                        setMobileMenuOpen(false);
+                        setSignInOpen(true);
+                      }}
+                      data-testid="button-mobile-sign-in"
+                    >
+                      Sign In
+                    </Button>
+                    <Button 
+                      className="w-full" 
+                      onClick={() => {
+                        setMobileMenuOpen(false);
+                        setSignUpOpen(true);
+                      }}
+                      data-testid="button-mobile-sign-up"
+                    >
+                      Sign Up
+                    </Button>
+                  </>
+                )}
               </motion.div>
             </motion.div>
           )}
         </AnimatePresence>
       </div>
+      
+      <SignInDialog 
+        open={signInOpen} 
+        onOpenChange={setSignInOpen}
+        onSwitchToSignUp={() => {
+          setSignInOpen(false);
+          setSignUpOpen(true);
+        }}
+      />
+      <SignUpDialog 
+        open={signUpOpen} 
+        onOpenChange={setSignUpOpen}
+        onSwitchToSignIn={() => {
+          setSignUpOpen(false);
+          setSignInOpen(true);
+        }}
+      />
     </motion.header>
   );
 }
