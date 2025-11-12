@@ -102,10 +102,15 @@ Preferred communication style: Simple, everyday language.
 
 **Authentication Features**
 - SignInDialog component with email/password and Google login
-- SignUpDialog component with email/password registration and password confirmation
+- SignUpDialog component with:
+  - First name and last name fields
+  - Email and password registration
+  - Password confirmation
+  - User profile creation with display name (firstName + lastName)
 - User dropdown menu in header with profile access and sign out
 - Toast notifications for success/error feedback
 - Form validation (password length, matching passwords, required fields)
+- Console logging of user information (UUID, first name, last name, email, display name) on signup and authentication state changes
 
 ### External Dependencies
 

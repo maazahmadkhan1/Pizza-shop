@@ -20,6 +20,8 @@ interface SignUpDialogProps {
 }
 
 export default function SignUpDialog({ open, onOpenChange, onSwitchToSignIn }: SignUpDialogProps) {
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -30,7 +32,7 @@ export default function SignUpDialog({ open, onOpenChange, onSwitchToSignIn }: S
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!email || !password || !confirmPassword) {
+    if (!firstName || !lastName || !email || !password || !confirmPassword) {
       toast({
         title: 'Error',
         description: 'Please fill in all fields',
@@ -59,12 +61,14 @@ export default function SignUpDialog({ open, onOpenChange, onSwitchToSignIn }: S
 
     setLoading(true);
     try {
-      await signup(email, password);
+      await signup(email, password, firstName, lastName);
       toast({
         title: 'Success',
         description: 'Account created successfully!',
       });
       onOpenChange(false);
+      setFirstName('');
+      setLastName('');
       setEmail('');
       setPassword('');
       setConfirmPassword('');
@@ -110,6 +114,38 @@ export default function SignUpDialog({ open, onOpenChange, onSwitchToSignIn }: S
         </DialogHeader>
         
         <form onSubmit={handleSubmit} className="space-y-4 mt-4">
+          <div className="space-y-2">
+            <Label htmlFor="signup-firstname">First Name</Label>
+            <div className="relative">
+              <User className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+              <Input
+                id="signup-firstname"
+                type="text"
+                placeholder="John"
+                value={firstName}
+                onChange={(e) => setFirstName(e.target.value)}
+                className="pl-10"
+                disabled={loading}
+              />
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="signup-lastname">Last Name</Label>
+            <div className="relative">
+              <User className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+              <Input
+                id="signup-lastname"
+                type="text"
+                placeholder="Doe"
+                value={lastName}
+                onChange={(e) => setLastName(e.target.value)}
+                className="pl-10"
+                disabled={loading}
+              />
+            </div>
+          </div>
+
           <div className="space-y-2">
             <Label htmlFor="signup-email">Email</Label>
             <div className="relative">
