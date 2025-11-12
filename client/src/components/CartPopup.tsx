@@ -54,6 +54,7 @@ export function CartPopup() {
               initial={{ scale: 0.8, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               transition={{ duration: 0.3 }}
+              className="flex flex-col items-center"
             >
               <ShoppingBag className="h-24 w-24 text-muted-foreground/30 mb-4" />
               <h3 className="text-xl font-semibold mb-2">Your cart is empty</h3>
