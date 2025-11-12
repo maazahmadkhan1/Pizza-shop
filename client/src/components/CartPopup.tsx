@@ -9,7 +9,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Minus, Plus, ShoppingBag, Trash2, X } from 'lucide-react';
+import { Minus, Plus, ShoppingBag, Trash2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Link } from 'wouter';
 
@@ -35,19 +35,9 @@ export function CartPopup() {
     <Sheet open={isOpen} onOpenChange={closeCart}>
       <SheetContent className="w-full sm:max-w-lg flex flex-col p-0">
         <SheetHeader className="px-6 py-4 border-b">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <ShoppingBag className="h-5 w-5 text-primary" />
-              <SheetTitle className="text-2xl">Your Cart</SheetTitle>
-            </div>
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={closeCart}
-              data-testid="button-close-cart"
-            >
-              <X className="h-5 w-5" />
-            </Button>
+          <div className="flex items-center gap-2">
+            <ShoppingBag className="h-5 w-5 text-primary" />
+            <SheetTitle className="text-2xl">Your Cart</SheetTitle>
           </div>
           <SheetDescription>
             {itemCount === 0

@@ -7,16 +7,24 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useCart } from "@/hooks/use-cart";
 
 export default function Header() {
-  const [location] = useLocation();
+  const [location, navigate] = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [theme, setTheme] = useState<'dark' | 'light'>('dark');
-  const { itemCount, toggleCart } = useCart();
+  const { itemCount, toggleCart, openCart } = useCart();
 
   const toggleTheme = () => {
     const newTheme = theme === 'dark' ? 'light' : 'dark';
     setTheme(newTheme);
     document.documentElement.classList.toggle('dark');
     console.log('Theme toggled to:', newTheme);
+  };
+
+  const handleOrderNow = () => {
+    if (itemCount > 0) {
+      navigate('/checkout');
+    } else {
+      openCart();
+    }
   };
 
   const navItems = [
@@ -87,17 +95,17 @@ export default function Header() {
             >
               <ShoppingCart className="h-5 w-5" />
               {itemCount > 0 && (
-                <Badge
-                  variant="destructive"
-                  className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center p-0 text-xs"
+                <span
+                  className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center rounded-full bg-primary text-primary-foreground text-xs font-semibold"
                   data-testid="badge-cart-count"
                 >
                   {itemCount}
-                </Badge>
+                </span>
               )}
             </Button>
             <Button
               className="hidden md:inline-flex"
+              onClick={handleOrderNow}
               data-testid="button-order-now"
             >
               Order Now
@@ -149,7 +157,14 @@ export default function Header() {
                 exit={{ opacity: 0, x: -20 }}
                 transition={{ duration: 0.2, delay: navItems.length * 0.05 }}
               >
-                <Button className="w-full" data-testid="button-mobile-order">
+                <Button 
+                  className="w-full" 
+                  onClick={() => {
+                    handleOrderNow();
+                    setMobileMenuOpen(false);
+                  }}
+                  data-testid="button-mobile-order"
+                >
                   Order Now
                 </Button>
               </motion.div>
