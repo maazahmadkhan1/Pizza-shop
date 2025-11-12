@@ -3,6 +3,8 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useState } from "react";
 import { motion } from "framer-motion";
+import { useCart } from "@/hooks/use-cart";
+import { useToast } from "@/hooks/use-toast";
 import chickenPizza from '@assets/generated_images/Halal_Chicken_Special_Pizza_e83ceb00.png';
 import veggiePizza from '@assets/generated_images/Veggie_Lovers_Pizza_35627115.png';
 import bbqPizza from '@assets/generated_images/BBQ_Chicken_Pizza_bfbf1bea.png';
@@ -21,6 +23,23 @@ import sodaDrinks from '@assets/generated_images/Assorted_soda_drink_selection_e
 export default function Menu() {
   // TODO: Remove mock data - replace with API calls
   const [selectedCategory, setSelectedCategory] = useState<'all' | 'specialty' | 'donairs' | 'sides' | 'salads' | 'drinks' | 'desserts'>('all');
+  const { addItem } = useCart();
+  const { toast } = useToast();
+
+  const handleAddToOrder = (item: { id: string; name: string; description: string; price: number; image: string }) => {
+    addItem({
+      id: item.id,
+      name: item.name,
+      description: item.description,
+      price: item.price,
+      image: item.image,
+    });
+    
+    toast({
+      title: 'Added to cart',
+      description: `${item.name} has been added to your cart`,
+    });
+  };
 
   const specialtyPizzas = [
     {
@@ -275,7 +294,7 @@ export default function Menu() {
                         <p className="text-sm text-muted-foreground">{item.description}</p>
                         <div className="flex items-center justify-between">
                           <span className="text-2xl font-bold text-primary">${item.price}</span>
-                          <Button onClick={() => console.log('Added:', item.id)} data-testid={`button-add-${item.id}`}>Add to Order</Button>
+                          <Button onClick={() => handleAddToOrder(item)} data-testid={`button-add-${item.id}`}>Add to Order</Button>
                         </div>
                       </CardContent>
                     </Card>
@@ -298,7 +317,7 @@ export default function Menu() {
                         <p className="text-sm text-muted-foreground">{item.description}</p>
                         <div className="flex items-center justify-between">
                           <span className="text-2xl font-bold text-primary">${item.price}</span>
-                          <Button onClick={() => console.log('Added:', item.id)}>Add to Order</Button>
+                          <Button onClick={() => handleAddToOrder(item)}>Add to Order</Button>
                         </div>
                       </CardContent>
                     </Card>
@@ -321,7 +340,7 @@ export default function Menu() {
                         <p className="text-sm text-muted-foreground">{item.description}</p>
                         <div className="flex items-center justify-between">
                           <span className="text-2xl font-bold text-primary">${item.price}</span>
-                          <Button onClick={() => console.log('Added:', item.id)} data-testid={`button-add-${item.id}`}>Add to Order</Button>
+                          <Button onClick={() => handleAddToOrder(item)} data-testid={`button-add-${item.id}`}>Add to Order</Button>
                         </div>
                       </CardContent>
                     </Card>
@@ -344,7 +363,7 @@ export default function Menu() {
                         <p className="text-sm text-muted-foreground">{item.description}</p>
                         <div className="flex items-center justify-between">
                           <span className="text-xl font-bold text-primary">${item.price.toFixed(2)}</span>
-                          <Button size="sm" onClick={() => console.log('Added:', item.id)}>Add</Button>
+                          <Button size="sm" onClick={() => handleAddToOrder(item)}>Add</Button>
                         </div>
                       </CardContent>
                     </Card>
@@ -367,7 +386,7 @@ export default function Menu() {
                         <p className="text-sm text-muted-foreground">{item.description}</p>
                         <div className="flex items-center justify-between">
                           <span className="text-xl font-bold text-primary">${item.price.toFixed(2)}</span>
-                          <Button size="sm" onClick={() => console.log('Added:', item.id)}>Add</Button>
+                          <Button size="sm" onClick={() => handleAddToOrder(item)}>Add</Button>
                         </div>
                       </CardContent>
                     </Card>
@@ -422,7 +441,7 @@ export default function Menu() {
                       <p className="text-sm text-muted-foreground">{side.description}</p>
                       <div className="flex items-center justify-between">
                         <span className="text-2xl font-bold text-primary">${side.price}</span>
-                        <Button onClick={() => console.log('Added:', side.id)}>
+                        <Button onClick={() => handleAddToOrder(side)}>
                           Add to Order
                         </Button>
                       </div>
@@ -458,7 +477,7 @@ export default function Menu() {
                       <p className="text-sm text-muted-foreground">{drink.description}</p>
                       <div className="flex items-center justify-between">
                         <span className="text-xl font-bold text-primary">${drink.price.toFixed(2)}</span>
-                        <Button size="sm" onClick={() => console.log('Added:', drink.id)}>
+                        <Button size="sm" onClick={() => handleAddToOrder(drink)}>
                           Add
                         </Button>
                       </div>
@@ -494,7 +513,7 @@ export default function Menu() {
                       <p className="text-sm text-muted-foreground">{donair.description}</p>
                       <div className="flex items-center justify-between">
                         <span className="text-2xl font-bold text-primary">${donair.price}</span>
-                        <Button onClick={() => console.log('Added:', donair.id)} data-testid={`button-add-${donair.id}`}>
+                        <Button onClick={() => handleAddToOrder(donair)} data-testid={`button-add-${donair.id}`}>
                           Add to Order
                         </Button>
                       </div>
@@ -530,7 +549,7 @@ export default function Menu() {
                       <p className="text-sm text-muted-foreground">{salad.description}</p>
                       <div className="flex items-center justify-between">
                         <span className="text-2xl font-bold text-primary">${salad.price}</span>
-                        <Button onClick={() => console.log('Added:', salad.id)} data-testid={`button-add-${salad.id}`}>
+                        <Button onClick={() => handleAddToOrder(salad)} data-testid={`button-add-${salad.id}`}>
                           Add to Order
                         </Button>
                       </div>
@@ -566,7 +585,7 @@ export default function Menu() {
                       <p className="text-sm text-muted-foreground">{dessert.description}</p>
                       <div className="flex items-center justify-between">
                         <span className="text-xl font-bold text-primary">${dessert.price.toFixed(2)}</span>
-                        <Button size="sm" onClick={() => console.log('Added:', dessert.id)}>
+                        <Button size="sm" onClick={() => handleAddToOrder(dessert)}>
                           Add
                         </Button>
                       </div>
