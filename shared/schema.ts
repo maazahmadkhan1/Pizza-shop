@@ -68,3 +68,43 @@ export interface Location {
   phone: string;
   hours: string;
 }
+
+export interface CartItem {
+  id: string;
+  name: string;
+  description?: string;
+  price: number;
+  quantity: number;
+  size?: string;
+  image?: string;
+  customizations?: {
+    crust?: string;
+    sauce?: string;
+    toppings?: string[];
+  };
+}
+
+export type DeliveryMethod = 'pickup' | 'delivery';
+export type PaymentMethod = 'cash' | 'card';
+
+export interface DeliveryAddress {
+  street: string;
+  city: string;
+  zip: string;
+  phone: string;
+}
+
+export interface Order {
+  id: string;
+  items: CartItem[];
+  deliveryMethod: DeliveryMethod;
+  deliveryAddress?: DeliveryAddress;
+  pickupLocation?: Location;
+  paymentMethod: PaymentMethod;
+  cardNumber?: string;
+  subtotal: number;
+  deliveryFee: number;
+  total: number;
+  status: 'pending' | 'confirmed' | 'preparing' | 'ready' | 'completed';
+  createdAt: Date;
+}
