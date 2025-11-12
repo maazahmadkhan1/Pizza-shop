@@ -26,7 +26,9 @@ export function CartPopup() {
 
   const handleQuantityChange = (id: string, currentQuantity: number, delta: number) => {
     const newQuantity = currentQuantity + delta;
-    if (newQuantity > 0) {
+    if (newQuantity === 0) {
+      removeItem(id);
+    } else if (newQuantity > 0) {
       updateQuantity(id, newQuantity);
     }
   };
