@@ -128,6 +128,20 @@ Preferred communication style: Simple, everyday language.
 - Firebase initialized in `client/src/lib/firebase.ts` with config from environment variables
 - AuthContext provides authentication methods: `signup`, `login`, `loginWithGoogle`, `logout`
 
+**Payment Processing**
+- **Square Web Payments SDK** (`react-square-web-payments-sdk`): Secure credit card payment processing integrated on checkout page
+- **Square API** (`square` package): Server-side payment creation and verification
+- Payment component in `client/src/components/SquarePaymentForm.tsx`
+- Server-side payment endpoint at `/api/square-payment` with authoritative pricing validation
+- **Security implementation**:
+  - Server fetches authoritative product catalog from Firebase Cloud Function
+  - Client sends only variation IDs and quantities (no prices)
+  - Backend validates variation IDs exist in catalog
+  - Backend calculates total in cents (converts Firebase dollar prices × 100)
+  - Delivery fee calculated server-side (599 cents = $5.99)
+  - Total validated > 0 before charging
+  - Square receives amount in cents (required format)
+
 **Form Handling**
 - **React Hook Form**: Form state management
 - **Zod**: Schema validation and type inference
