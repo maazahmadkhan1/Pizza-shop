@@ -7,13 +7,15 @@ import type { SquareProductsResponse } from "@shared/schema";
 import houseSpecial from '@assets/generated_images/House_Special_Pizza_e0ab3d75.png';
 import { Link } from "wouter";
 
+const FIREBASE_PRODUCTS_URL = 'https://us-central1-pizza-shop-3afe9.cloudfunctions.net/getSquareProducts';
+
 export default function Menu() {
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   
   const { data: productsData, isLoading } = useQuery<SquareProductsResponse>({
     queryKey: ['products'],
     queryFn: async () => {
-      const response = await fetch('/api/products');
+      const response = await fetch(FIREBASE_PRODUCTS_URL);
       if (!response.ok) {
         throw new Error('Failed to fetch products');
       }
