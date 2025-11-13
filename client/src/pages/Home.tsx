@@ -16,13 +16,11 @@ import heroImage3 from '@assets/stock_images/delicious_halal_pizz_81f4cbd2.jpg';
 import heroImage4 from '@assets/stock_images/delicious_halal_pizz_0eab6829.jpg';
 import houseSpecial from '@assets/generated_images/House_Special_Pizza_e0ab3d75.png';
 
-const FIREBASE_PRODUCTS_URL = 'https://us-central1-pizza-shop-3afe9.cloudfunctions.net/getSquareProducts';
-
 export default function Home() {
   const { data: productsData, isLoading } = useQuery<SquareProductsResponse>({
     queryKey: ['products'],
     queryFn: async () => {
-      const response = await fetch(FIREBASE_PRODUCTS_URL);
+      const response = await fetch('/api/products');
       if (!response.ok) {
         throw new Error('Failed to fetch products');
       }
