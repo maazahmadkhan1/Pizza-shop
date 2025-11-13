@@ -10,13 +10,14 @@ import {
   updateProfile,
 } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
+import { createSquareUser, saveSquareCustomer, getSquareCustomer } from '@/lib/squareUser';
 
 interface AuthContextType {
   currentUser: User | null;
   loading: boolean;
-  signup: (email: string, password: string, firstName: string, lastName: string) => Promise<void>;
+  signup: (email: string, password: string, firstName: string, lastName: string) => Promise<{ squareError?: string }>;
   login: (email: string, password: string) => Promise<void>;
-  loginWithGoogle: () => Promise<void>;
+  loginWithGoogle: () => Promise<{ squareError?: string }>;
   logout: () => Promise<void>;
 }
 
@@ -34,12 +35,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 
-  async function signup(email: string, password: string, firstName: string, lastName: string) {
+  async function signup(email: string, password: string, firstName: string, lastName: string): Promise<{ squareError?: string }> {
     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
     
     // Update user profile with display name
+    const fullName = `${firstName} ${lastName}`;
     await updateProfile(userCredential.user, {
-      displayName: `${firstName} ${lastName}`,
+      displayName: fullName,
     });
 
     // Log user information
@@ -49,13 +51,73 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     console.log('Last Name:', lastName);
     console.log('Email:', userCredential.user.email);
     console.log('Display Name:', userCredential.user.displayName);
+
+    // Try to create Square user (critical for checkout)
+    // But don't block authentication if it fails
+    try {
+      const squareCustomerId = await createSquareUser(
+        userCredential.user.uid,
+        fullName,
+        email
+      );
+      
+      console.log('Square customer created:', squareCustomerId);
+      
+      // Save Square customer ID to database
+      await saveSquareCustomer(
+        userCredential.user.uid,
+        squareCustomerId,
+        email,
+        fullName
+      );
+      
+      console.log('Square customer ID saved to database');
+      return {};
+    } catch (error: any) {
+      console.error('Error creating Square customer during signup:', error);
+      return { squareError: 'Payment system setup incomplete. You can still use the app, but may need to retry before checkout.' };
+    }
   }
 
   async function login(email: string, password: string) {
-    await signInWithEmailAndPassword(auth, email, password);
+    const userCredential = await signInWithEmailAndPassword(auth, email, password);
+    
+    // Try to reconcile Square customer if missing (recovery mechanism)
+    try {
+      const existingCustomer = await getSquareCustomer(userCredential.user.uid);
+      
+      if (!existingCustomer && userCredential.user.email) {
+        console.log('Square customer missing, attempting to create during login...');
+        
+        // Use displayName if available, otherwise extract from email, otherwise use "Customer"
+        const userName = userCredential.user.displayName || 
+                        (userCredential.user.email ? userCredential.user.email.split('@')[0] : 'Customer');
+        
+        const squareCustomerId = await createSquareUser(
+          userCredential.user.uid,
+          userName,
+          userCredential.user.email
+        );
+        
+        await saveSquareCustomer(
+          userCredential.user.uid,
+          squareCustomerId,
+          userCredential.user.email,
+          userName
+        );
+        
+        console.log('Square customer created during login recovery');
+      } else if (!existingCustomer && !userCredential.user.email) {
+        // Edge case: No email available (phone auth, etc.)
+        console.warn('Cannot create Square customer: no email available for user', userCredential.user.uid);
+      }
+    } catch (error) {
+      // Don't block login if Square reconciliation fails
+      console.error('Error reconciling Square customer during login:', error);
+    }
   }
 
-  async function loginWithGoogle() {
+  async function loginWithGoogle(): Promise<{ squareError?: string }> {
     const provider = new GoogleAuthProvider();
     const userCredential = await signInWithPopup(auth, provider);
     
@@ -64,6 +126,45 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     console.log('UUID:', userCredential.user.uid);
     console.log('Display Name:', userCredential.user.displayName);
     console.log('Email:', userCredential.user.email);
+
+    // Check if Square customer already exists
+    let existingCustomer;
+    try {
+      existingCustomer = await getSquareCustomer(userCredential.user.uid);
+    } catch (error) {
+      console.error('Error fetching existing Square customer:', error);
+    }
+    
+    if (!existingCustomer) {
+      // Try to create Square user for new Google sign-up
+      // But don't block authentication if it fails
+      try {
+        const squareCustomerId = await createSquareUser(
+          userCredential.user.uid,
+          userCredential.user.displayName || 'User',
+          userCredential.user.email || ''
+        );
+        
+        console.log('Square customer created for Google user:', squareCustomerId);
+        
+        // Save Square customer ID to database
+        await saveSquareCustomer(
+          userCredential.user.uid,
+          squareCustomerId,
+          userCredential.user.email || '',
+          userCredential.user.displayName || 'User'
+        );
+        
+        console.log('Square customer ID saved to database');
+        return {};
+      } catch (error: any) {
+        console.error('Error creating Square customer for Google user:', error);
+        return { squareError: 'Payment system setup incomplete. You can still use the app, but may need to sign in again before checkout.' };
+      }
+    } else {
+      console.log('Existing Square customer found:', existingCustomer.squareCustomerId);
+      return {};
+    }
   }
 
   async function logout() {

@@ -61,17 +61,27 @@ export default function SignUpDialog({ open, onOpenChange, onSwitchToSignIn }: S
 
     setLoading(true);
     try {
-      await signup(email, password, firstName, lastName);
-      toast({
-        title: 'Success',
-        description: 'Account created successfully!',
-      });
-      onOpenChange(false);
-      setFirstName('');
-      setLastName('');
-      setEmail('');
-      setPassword('');
-      setConfirmPassword('');
+      const result = await signup(email, password, firstName, lastName);
+      
+      if (result.squareError) {
+        toast({
+          title: 'Account Created with Warning',
+          description: result.squareError,
+          variant: 'default',
+          duration: 10000,
+        });
+      } else {
+        toast({
+          title: 'Success',
+          description: 'Account created successfully!',
+        });
+        onOpenChange(false);
+        setFirstName('');
+        setLastName('');
+        setEmail('');
+        setPassword('');
+        setConfirmPassword('');
+      }
     } catch (error: any) {
       toast({
         title: 'Error',
@@ -86,12 +96,22 @@ export default function SignUpDialog({ open, onOpenChange, onSwitchToSignIn }: S
   const handleGoogleSignUp = async () => {
     setLoading(true);
     try {
-      await loginWithGoogle();
-      toast({
-        title: 'Success',
-        description: 'Signed up with Google successfully!',
-      });
-      onOpenChange(false);
+      const result = await loginWithGoogle();
+      
+      if (result.squareError) {
+        toast({
+          title: 'Signed Up with Warning',
+          description: result.squareError,
+          variant: 'default',
+          duration: 10000,
+        });
+      } else {
+        toast({
+          title: 'Success',
+          description: 'Signed up with Google successfully!',
+        });
+        onOpenChange(false);
+      }
     } catch (error: any) {
       toast({
         title: 'Error',

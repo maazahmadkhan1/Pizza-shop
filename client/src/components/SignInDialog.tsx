@@ -62,12 +62,22 @@ export default function SignInDialog({ open, onOpenChange, onSwitchToSignUp }: S
   const handleGoogleSignIn = async () => {
     setLoading(true);
     try {
-      await loginWithGoogle();
-      toast({
-        title: 'Success',
-        description: 'Signed in with Google successfully!',
-      });
-      onOpenChange(false);
+      const result = await loginWithGoogle();
+      
+      if (result.squareError) {
+        toast({
+          title: 'Signed In with Warning',
+          description: result.squareError,
+          variant: 'default',
+          duration: 10000,
+        });
+      } else {
+        toast({
+          title: 'Success',
+          description: 'Signed in with Google successfully!',
+        });
+        onOpenChange(false);
+      }
     } catch (error: any) {
       toast({
         title: 'Error',
