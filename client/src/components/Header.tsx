@@ -1,13 +1,10 @@
 import { Link, useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Menu, X, Moon, Sun, ShoppingCart } from "lucide-react";
+import { Menu, X, Moon, Sun, ShoppingCart, User, LogOut } from "lucide-react";
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useCart } from "@/hooks/use-cart";
-import { Menu, X, Moon, Sun, User, LogOut } from "lucide-react";
-import { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "@/contexts/AuthContext";
 import SignInDialog from "@/components/SignInDialog";
 import SignUpDialog from "@/components/SignUpDialog";
@@ -131,12 +128,6 @@ export default function Header() {
             
             {currentUser ? (
               <>
-                <Button
-                  className="hidden md:inline-flex"
-                  data-testid="button-order-now"
-                >
-                  Order Now
-                </Button>
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button variant="ghost" size="icon" className="hidden md:inline-flex">
@@ -230,19 +221,16 @@ export default function Header() {
                 exit={{ opacity: 0, x: -20 }}
                 transition={{ duration: 0.2, delay: navItems.length * 0.05 }}
               >
-                <Button 
-                  className="w-full" 
-                  onClick={() => {
-                    handleOrderNow();
-                    setMobileMenuOpen(false);
-                  }}
-                  data-testid="button-mobile-order"
-                >
-                  Order Now
-                </Button>
                 {currentUser ? (
                   <>
-                    <Button className="w-full mb-2" data-testid="button-mobile-order">
+                    <Button 
+                      className="w-full mb-2" 
+                      onClick={() => {
+                        handleOrderNow();
+                        setMobileMenuOpen(false);
+                      }}
+                      data-testid="button-mobile-order"
+                    >
                       Order Now
                     </Button>
                     <div className="w-full p-4 bg-secondary rounded-md">
