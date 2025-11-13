@@ -133,6 +133,10 @@ Preferred communication style: Simple, everyday language.
 - **Square API** (`square` package): Server-side payment creation and verification
 - Payment component in `client/src/components/SquarePaymentForm.tsx`
 - Server-side payment endpoint at `/api/square-payment` with authoritative pricing validation
+- **Required Environment Variables**:
+  - `VITE_SQUARE_APPLICATION_ID`: Square Application ID (client-side)
+  - `VITE_SQUARE_LOCATION_ID`: Square Location ID (client-side)
+  - `SQUARE_ACCESS_TOKEN`: Square Access Token (server-side only, starts with "sandbox-" for testing or "sq0atp-" for production)
 - **Security implementation**:
   - Server fetches authoritative product catalog from Firebase Cloud Function
   - Client sends only variation IDs and quantities (no prices)
@@ -141,6 +145,17 @@ Preferred communication style: Simple, everyday language.
   - Delivery fee calculated server-side (599 cents = $5.99)
   - Total validated > 0 before charging
   - Square receives amount in cents (required format)
+- **Payment Flow**:
+  1. User selects "Credit/Debit Card" payment method on checkout page
+  2. Square payment form appears with card input fields (powered by Square Web Payments SDK)
+  3. User enters card details (tokenized by Square, never touches our server)
+  4. User clicks "Pay Now" button in the Square form
+  5. Card is tokenized by Square SDK and sent to our backend `/api/square-payment` endpoint
+  6. Backend fetches authoritative pricing, validates items, creates Square customer if needed
+  7. Backend processes payment via Square API
+  8. Payment success/failure is communicated back to the checkout page
+  9. If successful, "Confirm Order" button becomes enabled
+  10. User clicks "Confirm Order" to complete the checkout process
 
 **Form Handling**
 - **React Hook Form**: Form state management
