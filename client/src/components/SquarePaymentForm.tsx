@@ -101,14 +101,7 @@ export default function SquarePaymentForm({
           style={{
             input: {
               fontSize: '14px',
-              color: 'hsl(var(--foreground))',
               fontFamily: 'inherit',
-            },
-            'input::placeholder': {
-              color: 'hsl(var(--muted-foreground))',
-            },
-            '.error': {
-              color: 'hsl(var(--destructive))',
             },
           }}
         />
