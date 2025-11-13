@@ -52,23 +52,20 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
-        <CartProvider>
-      <AuthProvider>
-        <TooltipProvider>
-          <div className="flex flex-col min-h-screen">
-            <Header />
-            <main className="flex-1">
-              <Router />
-            </main>
-            <Footer />
-          </div>
-          <CartPopup />
-          <Toaster />
-        </CartProvider>
+        <AuthProvider>
+          <CartProvider>
+            <div className="flex flex-col min-h-screen">
+              <Header />
+              <main className="flex-1">
+                <Router />
+              </main>
+              <Footer />
+            </div>
+            <CartPopup />
+            <Toaster />
+          </CartProvider>
+        </AuthProvider>
       </TooltipProvider>
-          <Toaster />
-        </TooltipProvider>
-      </AuthProvider>
     </QueryClientProvider>
   );
 }
