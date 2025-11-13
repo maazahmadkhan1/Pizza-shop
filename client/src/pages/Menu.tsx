@@ -130,7 +130,7 @@ export default function Menu() {
                         transition={{ duration: 0.3, delay: index * 0.05 }}
                       >
                         <PizzaCard
-                          id={product.id}
+                          id={product.variations[0]?.id || product.id}
                           name={product.name}
                           description={product.description}
                           price={product.variations[0]?.price || 0}
@@ -157,7 +157,7 @@ export default function Menu() {
                   transition={{ duration: 0.3, delay: index * 0.05 }}
                 >
                   <PizzaCard
-                    id={product.id}
+                    id={product.variations[0]?.id || product.id}
                     name={product.name}
                     description={product.description}
                     price={product.variations[0]?.price || 0}

@@ -34,7 +34,7 @@ export default function Home() {
     .filter(p => p.category === 'Specialty Pizzas')
     .slice(0, 2)
     .map(p => ({
-      id: p.id,
+      id: p.variations[0]?.id || p.id,
       name: p.name,
       description: p.description,
       price: p.variations[0]?.price || 0,
