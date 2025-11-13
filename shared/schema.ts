@@ -17,6 +17,21 @@ export const insertUserSchema = createInsertSchema(users).pick({
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type User = typeof users.$inferSelect;
 
+export const squareCustomers = pgTable("square_customers", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  firebaseUid: text("firebase_uid").notNull().unique(),
+  squareCustomerId: text("square_customer_id").notNull(),
+  email: text("email").notNull(),
+  name: text("name").notNull(),
+});
+
+export const insertSquareCustomerSchema = createInsertSchema(squareCustomers).omit({
+  id: true,
+});
+
+export type InsertSquareCustomer = z.infer<typeof insertSquareCustomerSchema>;
+export type SquareCustomer = typeof squareCustomers.$inferSelect;
+
 export interface Pizza {
   id: string;
   name: string;
@@ -108,6 +123,8 @@ export interface Order {
   total: number;
   status: 'pending' | 'confirmed' | 'preparing' | 'ready' | 'completed';
   createdAt: Date;
+}
+
 export interface ProductVariation {
   id: string;
   name: string;
