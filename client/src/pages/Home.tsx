@@ -7,6 +7,38 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Link } from "wouter";
 import PizzaCard from "@/components/PizzaCard";
 import { motion } from "framer-motion";
+import chickenPizza from '@assets/image_1762844821511.png';
+import veggiePizza from '@assets/image_1762844897590.png';
+import margheritaPizza from '@assets/image_1762844795851.png';
+import buildPizzaImage from '@assets/generated_images/Premium_pizza_assembly_scene_5d570890.png';
+import heroImage1 from '@assets/stock_images/delicious_fresh_hala_853e16eb.jpg';
+import heroImage2 from '@assets/stock_images/delicious_fresh_hala_9ee11a8e.jpg';
+import heroImage3 from '@assets/stock_images/delicious_fresh_hala_d48f153c.jpg';
+import heroImage4 from '@assets/stock_images/delicious_fresh_hala_113229da.jpg';
+
+export default function Home() {
+  // TODO: Remove mock data - replace with API calls
+  const featuredPizzas = [
+    {
+      id: 'margherita',
+      name: 'Margherita Classic',
+      description: 'Fresh mozzarella, tomato sauce, and basil. Simple yet perfect traditional Italian pizza.',
+      price: 14,
+      image: margheritaPizza
+    },
+    {
+      id: 'cheese-stretch',
+      name: 'Ultimate Cheese',
+      description: 'Loaded with premium mozzarella and cheddar. Experience the ultimate cheese pull!',
+      price: 16,
+      image: chickenPizza
+    },
+    {
+      id: 'mushroom-olive',
+      name: 'Mushroom & Olive',
+      description: 'Fresh mushrooms and black olives on our signature sauce. A savory vegetarian favorite.',
+      price: 15,
+      image: veggiePizza
 import { useQuery } from "@tanstack/react-query";
 import type { SquareProductsResponse } from "@shared/schema";
 import buildPizzaImage from '@assets/generated_images/Premium_pizza_assembly_scene_5d570890.png';

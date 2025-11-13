@@ -2,6 +2,8 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { motion } from "framer-motion";
+import { useCart } from "@/hooks/use-cart";
+import { useToast } from "@/hooks/use-toast";
 
 interface PizzaCardProps {
   id: string;
@@ -22,11 +24,26 @@ export default function PizzaCard({
   isHalal = true,
   onAddToOrder
 }: PizzaCardProps) {
+  const { addItem, openCart } = useCart();
+  const { toast } = useToast();
+
   const handleAddToOrder = () => {
+    addItem({
+      id,
+      name,
+      description,
+      price,
+      image,
+    });
+    
+    toast({
+      title: 'Added to cart',
+      description: `${name} has been added to your cart`,
+    });
+
     if (onAddToOrder) {
       onAddToOrder(id);
     }
-    console.log('Added to order:', id, name);
   };
 
   return (

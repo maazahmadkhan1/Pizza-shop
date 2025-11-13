@@ -124,13 +124,13 @@ export default function Hero({
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: 0.3 + index * 0.1 }}
-                className="inline-block"
+                className="inline-block mr-2 md:mr-3"
               >
                 {isOrange ? (
                   <span className="text-primary">{word}</span>
                 ) : (
                   word
-                )}{' '}
+                )}
               </motion.span>
             );
           })}

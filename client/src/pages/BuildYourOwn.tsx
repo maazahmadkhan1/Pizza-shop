@@ -6,6 +6,8 @@ import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { Check } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { useCart } from '@/hooks/use-cart';
+import { useToast } from '@/hooks/use-toast';
 
 const sizes = [
   { id: 'small', name: 'Small 10"', price: 10.99 },
@@ -57,6 +59,8 @@ export default function BuildYourOwn() {
   const [selectedSauce, setSelectedSauce] = useState(sauces[0].id);
   const [selectedCheese, setSelectedCheese] = useState(cheeses[0].id);
   const [selectedToppings, setSelectedToppings] = useState<string[]>([]);
+  const { addItem } = useCart();
+  const { toast } = useToast();
 
   const toggleTopping = (toppingId: string) => {
     setSelectedToppings(prev => 
@@ -76,6 +80,32 @@ export default function BuildYourOwn() {
     }, 0);
     
     return sizePrice + crustPrice + cheesePrice + toppingsPrice;
+  };
+
+  const handleAddToCart = () => {
+    const selectedSizeObj = sizes.find(s => s.id === selectedSize);
+    const selectedCrustObj = crusts.find(c => c.id === selectedCrust);
+    const selectedSauceObj = sauces.find(s => s.id === selectedSauce);
+    const selectedCheeseObj = cheeses.find(c => c.id === selectedCheese);
+    const selectedToppingsObjs = selectedToppings.map(id => toppings.find(t => t.id === id)?.name).filter(Boolean);
+
+    addItem({
+      id: `custom-${Date.now()}`,
+      name: 'Custom Pizza',
+      price: calculateTotal(),
+      size: selectedSizeObj?.name,
+      customizations: {
+        crust: selectedCrustObj?.name,
+        sauce: selectedSauceObj?.name,
+        cheese: selectedCheeseObj?.name,
+        toppings: selectedToppingsObjs as string[],
+      },
+    });
+
+    toast({
+      title: 'Added to cart',
+      description: 'Your custom pizza has been added to your cart.',
+    });
   };
 
   const meatToppings = toppings.filter(t => t.category === 'meat');
@@ -415,7 +445,7 @@ export default function BuildYourOwn() {
                     <Button 
                       className="w-full text-lg py-6 h-auto"
                       size="lg"
-                      onClick={() => console.log('Add to cart clicked')}
+                      onClick={handleAddToCart}
                       data-testid="button-add-to-cart"
                     >
                       Add to Cart

@@ -102,7 +102,7 @@ export default function PizzaTimeline() {
                             loading="lazy"
                             data-testid={`img-timeline-${index}`}
                           />
-                          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent opacity-80 group-hover:opacity-60 transition-opacity duration-300" />
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-black/10 opacity-90 group-hover:opacity-70 transition-opacity duration-300" />
                           <motion.div 
                             className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300"
                             initial={false}
