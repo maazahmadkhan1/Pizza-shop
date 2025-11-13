@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react';
 import { PaymentForm, CreditCard } from 'react-square-web-payments-sdk';
 import { useAuth } from '@/contexts/AuthContext';
 import type { TokenResult, ChargeVerifyBuyerDetails } from '@square/web-payments-sdk-types';
@@ -19,14 +20,27 @@ export default function SquarePaymentForm({
   onPaymentError,
 }: SquarePaymentFormProps) {
   const { currentUser } = useAuth();
+  const [isClient, setIsClient] = useState(false);
 
   const applicationId = import.meta.env.VITE_SQUARE_APPLICATION_ID;
   const locationId = import.meta.env.VITE_SQUARE_LOCATION_ID;
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
 
   if (!applicationId || !locationId) {
     return (
       <div className="p-4 bg-destructive/10 text-destructive rounded-md">
         Square payment credentials are not configured. Please contact support.
+      </div>
+    );
+  }
+
+  if (!isClient) {
+    return (
+      <div className="p-4 bg-muted rounded-md">
+        Loading payment form...
       </div>
     );
   }
