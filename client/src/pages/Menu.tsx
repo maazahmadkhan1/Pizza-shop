@@ -19,7 +19,9 @@ export default function Menu() {
       if (!response.ok) {
         throw new Error('Failed to fetch products');
       }
-      return response.json();
+      const data = await response.json();
+      console.log('Firebase function response (Menu):', data);
+      return data;
     }
   });
 

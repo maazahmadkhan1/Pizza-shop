@@ -167,6 +167,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           throw new Error('Failed to fetch product catalog');
         }
         productsResponse = await response.json();
+        console.log('Firebase function response (Server - payment verification):', productsResponse);
       } catch (error) {
         console.error('Error fetching product catalog:', error);
         return res.status(500).json({ 
