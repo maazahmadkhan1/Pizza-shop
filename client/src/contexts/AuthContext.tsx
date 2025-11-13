@@ -10,7 +10,7 @@ import {
   updateProfile,
 } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
-import { createSquareUser, saveSquareCustomer, getSquareCustomer } from '@/lib/squareUser';
+import { createSquareUser, getSquareCustomer } from '@/lib/squareUser';
 
 interface AuthContextType {
   currentUser: User | null;
@@ -52,8 +52,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     console.log('Email:', userCredential.user.email);
     console.log('Display Name:', userCredential.user.displayName);
 
-    // Try to create Square user (critical for checkout)
-    // But don't block authentication if it fails
+    // Try to create Square customer (critical for checkout)
+    // Backend handles both Square creation and database storage
     try {
       const squareCustomerId = await createSquareUser(
         userCredential.user.uid,
@@ -61,17 +61,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         email
       );
       
-      console.log('Square customer created:', squareCustomerId);
-      
-      // Save Square customer ID to database
-      await saveSquareCustomer(
-        userCredential.user.uid,
-        squareCustomerId,
-        email,
-        fullName
-      );
-      
-      console.log('Square customer ID saved to database');
+      console.log('Square customer created and saved:', squareCustomerId);
       return {};
     } catch (error: any) {
       console.error('Error creating Square customer during signup:', error);
@@ -89,30 +79,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (!existingCustomer && userCredential.user.email) {
         console.log('Square customer missing, attempting to create during login...');
         
-        // Use displayName if available, otherwise extract from email, otherwise use "Customer"
         const userName = userCredential.user.displayName || 
                         (userCredential.user.email ? userCredential.user.email.split('@')[0] : 'Customer');
         
-        const squareCustomerId = await createSquareUser(
+        await createSquareUser(
           userCredential.user.uid,
           userName,
           userCredential.user.email
         );
         
-        await saveSquareCustomer(
-          userCredential.user.uid,
-          squareCustomerId,
-          userCredential.user.email,
-          userName
-        );
-        
         console.log('Square customer created during login recovery');
       } else if (!existingCustomer && !userCredential.user.email) {
-        // Edge case: No email available (phone auth, etc.)
         console.warn('Cannot create Square customer: no email available for user', userCredential.user.uid);
       }
     } catch (error) {
-      // Don't block login if Square reconciliation fails
       console.error('Error reconciling Square customer during login:', error);
     }
   }
@@ -136,8 +116,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
     
     if (!existingCustomer) {
-      // Try to create Square user for new Google sign-up
-      // But don't block authentication if it fails
+      // Try to create Square customer for new Google sign-up
+      // Backend handles both Square creation and database storage
       try {
         const squareCustomerId = await createSquareUser(
           userCredential.user.uid,
@@ -145,17 +125,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           userCredential.user.email || ''
         );
         
-        console.log('Square customer created for Google user:', squareCustomerId);
-        
-        // Save Square customer ID to database
-        await saveSquareCustomer(
-          userCredential.user.uid,
-          squareCustomerId,
-          userCredential.user.email || '',
-          userCredential.user.displayName || 'User'
-        );
-        
-        console.log('Square customer ID saved to database');
+        console.log('Square customer created and saved for Google user:', squareCustomerId);
         return {};
       } catch (error: any) {
         console.error('Error creating Square customer for Google user:', error);

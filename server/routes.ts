@@ -6,13 +6,78 @@ import { SquareClient, SquareEnvironment } from "square";
 import { randomUUID } from "crypto";
 import { z } from "zod";
 
+function getSquareClient() {
+  if (!process.env.SQUARE_ACCESS_TOKEN || !process.env.SQUARE_LOCATION_ID) {
+    throw new Error("Square credentials not configured");
+  }
+
+  return new SquareClient({
+    token: process.env.SQUARE_ACCESS_TOKEN,
+    environment: process.env.SQUARE_ACCESS_TOKEN.startsWith('sandbox-') 
+      ? SquareEnvironment.Sandbox 
+      : SquareEnvironment.Production,
+  });
+}
+
+async function findOrCreateSquareCustomer(firebaseUid: string, email: string, name: string) {
+  const existing = await storage.getSquareCustomerByFirebaseUid(firebaseUid);
+  if (existing) {
+    console.log(`Found existing customer in storage: ${existing.squareCustomerId}`);
+    return existing;
+  }
+
+  const squareClient = getSquareClient();
+
+  const searchResponse = await squareClient.customers.search({
+    query: {
+      filter: {
+        emailAddress: {
+          exact: email,
+        },
+      },
+    },
+  });
+
+  let squareCustomerId: string;
+
+  if (searchResponse.customers && searchResponse.customers.length > 0) {
+    squareCustomerId = searchResponse.customers[0].id!;
+    console.log(`Found existing Square customer: ${squareCustomerId}`);
+  } else {
+    const createResponse = await squareClient.customers.create({
+      idempotencyKey: firebaseUid,
+      emailAddress: email,
+      givenName: name || email.split('@')[0],
+    });
+
+    if (!createResponse.customer?.id) {
+      throw new Error("Failed to create Square customer");
+    }
+
+    squareCustomerId = createResponse.customer.id;
+    console.log(`Created new Square customer: ${squareCustomerId}`);
+  }
+
+  try {
+    const customer = await storage.createSquareCustomer({
+      firebaseUid,
+      squareCustomerId,
+      email,
+      name: name || email.split('@')[0],
+    });
+
+    return customer;
+  } catch (error: any) {
+    console.log(`Storage insert failed (likely duplicate), re-fetching: ${error.message}`);
+    const refetched = await storage.getSquareCustomerByFirebaseUid(firebaseUid);
+    if (refetched) {
+      return refetched;
+    }
+    throw new Error(`Failed to create or retrieve customer: ${error.message}`);
+  }
+}
+
 export async function registerRoutes(app: Express): Promise<Server> {
-  // put application routes here
-  // prefix all routes with /api
-
-  // use storage to perform CRUD operations on the storage interface
-  // e.g. storage.insertUser(user) or storage.getUserByUsername(username)
-
   // Get Square customer by Firebase UID
   app.get("/api/square-customer/:firebaseUid", async (req, res) => {
     try {
@@ -35,17 +100,34 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const validatedData = insertSquareCustomerSchema.parse(req.body);
       
-      // Check if customer already exists
-      const existing = await storage.getSquareCustomerByFirebaseUid(validatedData.firebaseUid);
-      if (existing) {
-        return res.json(existing);
+      const customer = await findOrCreateSquareCustomer(
+        validatedData.firebaseUid,
+        validatedData.email,
+        validatedData.name
+      );
+      
+      res.status(201).json(customer);
+    } catch (error: any) {
+      console.error("Error creating Square customer:", error);
+      
+      if (error.name === 'ZodError') {
+        return res.status(400).json({ 
+          error: "Invalid request data",
+          message: error.errors?.[0]?.message || "Validation failed"
+        });
       }
       
-      const customer = await storage.createSquareCustomer(validatedData);
-      res.status(201).json(customer);
-    } catch (error) {
-      console.error("Error creating Square customer:", error);
-      res.status(400).json({ error: "Failed to create customer" });
+      if (error.statusCode && error.statusCode >= 400 && error.statusCode < 500) {
+        return res.status(400).json({ 
+          error: "Square API error",
+          message: error.message || "Failed to create customer in Square"
+        });
+      }
+      
+      res.status(500).json({ 
+        error: "Failed to create customer",
+        message: error.message || "Unknown error"
+      });
     }
   });
 
@@ -137,21 +219,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       // Initialize Square client
-      const squareClient = new SquareClient({
-        token: process.env.SQUARE_ACCESS_TOKEN,
-        environment: process.env.SQUARE_ACCESS_TOKEN.startsWith('sandbox-') 
-          ? SquareEnvironment.Sandbox 
-          : SquareEnvironment.Production,
-      });
+      const squareClient = getSquareClient();
 
-      // Get customer's Square ID if they have one
+      // Ensure customer exists in Square (defensive provisioning)
       let customerId: string | undefined;
       if (firebaseUid) {
         try {
           const customer = await storage.getSquareCustomerByFirebaseUid(firebaseUid);
           customerId = customer?.squareCustomerId;
         } catch (error) {
-          console.log("Could not find Square customer ID:", error);
+          console.log("Could not find Square customer ID, will create on-demand:", error);
         }
       }
 
