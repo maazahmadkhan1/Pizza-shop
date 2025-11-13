@@ -9,7 +9,7 @@ import {
   signInWithPopup,
   updateProfile,
 } from 'firebase/auth';
-import { auth } from '@/lib/firebase';
+import { auth, isFirebaseConfigured } from '@/lib/firebase';
 
 interface AuthContextType {
   currentUser: User | null;
@@ -35,6 +35,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   async function signup(email: string, password: string, firstName: string, lastName: string) {
+    if (!auth || !isFirebaseConfigured) {
+      throw new Error('Firebase authentication is not configured');
+    }
     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
     
     // Update user profile with display name
@@ -52,10 +55,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   async function login(email: string, password: string) {
+    if (!auth || !isFirebaseConfigured) {
+      throw new Error('Firebase authentication is not configured');
+    }
     await signInWithEmailAndPassword(auth, email, password);
   }
 
   async function loginWithGoogle() {
+    if (!auth || !isFirebaseConfigured) {
+      throw new Error('Firebase authentication is not configured');
+    }
     const provider = new GoogleAuthProvider();
     const userCredential = await signInWithPopup(auth, provider);
     
@@ -67,10 +76,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   async function logout() {
+    if (!auth || !isFirebaseConfigured) {
+      throw new Error('Firebase authentication is not configured');
+    }
     await signOut(auth);
   }
 
   useEffect(() => {
+    if (!auth || !isFirebaseConfigured) {
+      setLoading(false);
+      return;
+    }
+
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       setCurrentUser(user);
       setLoading(false);
