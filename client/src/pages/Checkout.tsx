@@ -18,6 +18,7 @@ import { motion } from 'framer-motion';
 import { MapPin, CreditCard, Wallet, Store, Truck, Package } from 'lucide-react';
 import { useLocation } from 'wouter';
 import type { DeliveryMethod, PaymentMethod, Location } from '@shared/schema';
+import SquarePaymentForm from '@/components/SquarePaymentForm';
 
 const storeLocations: Location[] = [
   {
@@ -64,6 +65,7 @@ export default function Checkout() {
 
   const [cardNumber, setCardNumber] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [paymentId, setPaymentId] = useState<string | null>(null);
 
   const deliveryFee = deliveryMethod === 'delivery' ? 5.99 : 0;
   const total = subtotal + deliveryFee;
@@ -100,10 +102,10 @@ export default function Checkout() {
       }
     }
 
-    if (paymentMethod === 'card' && !cardNumber) {
+    if (paymentMethod === 'card' && !paymentId) {
       toast({
         title: 'Error',
-        description: 'Please enter your card number',
+        description: 'Please complete the payment to continue',
         variant: 'destructive',
         });
       setIsSubmitting(false);
@@ -390,18 +392,33 @@ export default function Checkout() {
                     <motion.div
                       initial={{ opacity: 0, height: 0 }}
                       animate={{ opacity: 1, height: 'auto' }}
-                      className="mt-4"
+                      className="mt-6"
                     >
-                      <Label htmlFor="cardNumber">Card Number</Label>
-                      <Input
-                        id="cardNumber"
-                        type="text"
-                        placeholder="1234 5678 9012 3456"
-                        value={cardNumber}
-                        onChange={(e) => setCardNumber(e.target.value)}
-                        maxLength={19}
-                        data-testid="input-card-number"
+                      <SquarePaymentForm
+                        amount={total}
+                        items={items}
+                        deliveryMethod={deliveryMethod}
+                        onPaymentSuccess={(id) => {
+                          setPaymentId(id);
+                          toast({
+                            title: 'Payment Successful',
+                            description: 'Your payment has been processed successfully',
+                          });
+                        }}
+                        onPaymentError={(error) => {
+                          setPaymentId(null);
+                          toast({
+                            title: 'Payment Failed',
+                            description: error,
+                            variant: 'destructive',
+                          });
+                        }}
                       />
+                      {paymentId && (
+                        <p className="text-sm text-green-600 mt-2">
+                          ✓ Payment completed successfully
+                        </p>
+                      )}
                     </motion.div>
                   )}
                 </CardContent>
@@ -454,10 +471,10 @@ export default function Checkout() {
                     type="submit"
                     className="w-full"
                     size="lg"
-                    disabled={isSubmitting}
+                    disabled={isSubmitting || (paymentMethod === 'card' && !paymentId)}
                     data-testid="button-confirm-order"
                   >
-                    {isSubmitting ? 'Processing...' : 'Confirm Order'}
+                    {isSubmitting ? 'Processing...' : paymentMethod === 'card' && !paymentId ? 'Complete Payment First' : 'Confirm Order'}
                   </Button>
 
                   <p className="text-xs text-muted-foreground text-center">
