@@ -72,6 +72,25 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   async function login(email: string, password: string) {
     const userCredential = await signInWithEmailAndPassword(auth, email, password);
     
+    // Call loginUser function to retrieve and log user ID
+    const loginUserUrl = import.meta.env.VITE_FIREBASE_LOGIN_USER_URL || 'https://us-central1-pizza-shop-3afe9.cloudfunctions.net/loginUser';
+    try {
+      const loginResponse = await fetch(loginUserUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          uid: userCredential.user.uid
+        }),
+      });
+      
+      const loginData = await loginResponse.json();
+      console.log('🔐 Login User Response:', loginData);
+    } catch (error) {
+      console.error('Error calling loginUser function:', error);
+    }
+    
     // Try to reconcile Square customer if missing (recovery mechanism)
     try {
       const existingCustomer = await getSquareCustomer(userCredential.user.uid);
@@ -100,6 +119,25 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   async function loginWithGoogle(): Promise<{ squareError?: string }> {
     const provider = new GoogleAuthProvider();
     const userCredential = await signInWithPopup(auth, provider);
+    
+    // Call loginUser function to retrieve and log user ID
+    const loginUserUrl = import.meta.env.VITE_FIREBASE_LOGIN_USER_URL || 'https://us-central1-pizza-shop-3afe9.cloudfunctions.net/loginUser';
+    try {
+      const loginResponse = await fetch(loginUserUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          uid: userCredential.user.uid
+        }),
+      });
+      
+      const loginData = await loginResponse.json();
+      console.log('🔐 Login User Response (Google):', loginData);
+    } catch (error) {
+      console.error('Error calling loginUser function:', error);
+    }
     
     // Log user information for Google sign-in
     console.log('User signed in with Google:');
