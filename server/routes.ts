@@ -193,6 +193,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Note: Firebase catalog stores prices as dollars (e.g., 17.99)
       // We need to work in cents throughout to avoid floating point issues
       let subtotalCents = 0;
+      const lineItems = [];
       
       for (const item of items) {
         // Find the variation across all products
@@ -220,6 +221,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
         // foundVariation.price is in dollars (e.g., 17.99)
         const priceInCents = Math.round(foundVariation.price * 100);
         subtotalCents += priceInCents * item.quantity;
+        
+        // Add line item for Square order
+        lineItems.push({
+          quantity: item.quantity.toString(),
+          name: `${foundProduct.name} - ${foundVariation.name}`,
+          basePriceMoney: {
+            amount: BigInt(priceInCents),
+            currency: 'USD' as const,
+          },
+        });
       }
 
       // Add delivery fee in cents
@@ -244,7 +255,35 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       }
 
-      // Create payment
+      // Add delivery fee as a line item if applicable
+      if (deliveryFeeCents > 0) {
+        lineItems.push({
+          quantity: '1',
+          name: 'Delivery Fee',
+          basePriceMoney: {
+            amount: BigInt(deliveryFeeCents),
+            currency: 'USD' as const,
+          },
+        });
+      }
+
+      // Create an order first with line items
+      const orderResponse = await squareClient.orders.create({
+        order: {
+          locationId: process.env.SQUARE_LOCATION_ID,
+          lineItems: lineItems,
+          ...(customerId && { customerId }),
+        },
+        idempotencyKey: randomUUID(),
+      });
+
+      if (!orderResponse.order?.id) {
+        throw new Error('Failed to create order');
+      }
+
+      console.log('Created Square order:', orderResponse.order.id);
+
+      // Create payment linked to the order
       const paymentResponse = await squareClient.payments.create({
         sourceId,
         amountMoney: {
@@ -252,6 +291,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           currency: 'USD',
         },
         locationId: process.env.SQUARE_LOCATION_ID,
+        orderId: orderResponse.order.id,
         idempotencyKey: randomUUID(),
         ...(customerId && { customerId }),
       });
