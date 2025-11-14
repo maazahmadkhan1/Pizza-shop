@@ -27,6 +27,9 @@ export const squareCustomers = pgTable("square_customers", {
 
 export const insertSquareCustomerSchema = createInsertSchema(squareCustomers).omit({
   id: true,
+  squareCustomerId: true,
+}).extend({
+  squareCustomerId: z.string().optional(),
 });
 
 export type InsertSquareCustomer = z.infer<typeof insertSquareCustomerSchema>;
