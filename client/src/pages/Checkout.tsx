@@ -136,6 +136,27 @@ export default function Checkout() {
         ),
       };
       
+      // Log cash orders (without payment) for Firebase function development
+      if (paymentMethod === 'cash') {
+        console.log('💰 CASH ORDER DATA (For Firebase Function):', {
+          ...orderData,
+          orderType: deliveryMethod === 'delivery' ? 'Cash on Delivery' : 'Cash at Pickup',
+          itemDetails: orderData.items.map(item => ({
+            id: item.id,
+            name: item.name,
+            size: item.size,
+            quantity: item.quantity,
+            price: item.price,
+            total: item.price * item.quantity
+          })),
+          pricing: {
+            subtotal: orderData.subtotal,
+            deliveryFee: orderData.deliveryFee,
+            total: orderData.total
+          }
+        });
+      }
+      
       console.log('✅ Order Data Being Submitted:', orderData);
       
       setLastOrder(orderData);
