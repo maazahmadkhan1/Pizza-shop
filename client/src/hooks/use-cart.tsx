@@ -1,5 +1,8 @@
-import { createContext, useContext, useReducer, ReactNode } from 'react';
+import { createContext, useContext, useReducer, ReactNode, useEffect } from 'react';
 import type { CartItem, DeliveryMethod, PaymentMethod } from '@shared/schema';
+
+const CART_STORAGE_KEY = 'pizza-cart';
+const ORDER_STORAGE_KEY = 'pizza-last-order';
 
 export interface OrderData {
   orderNumber: string;
@@ -37,7 +40,8 @@ type CartAction =
   | { type: 'TOGGLE_CART' }
   | { type: 'OPEN_CART' }
   | { type: 'CLOSE_CART' }
-  | { type: 'SET_ORDER'; order: OrderData };
+  | { type: 'SET_ORDER'; order: OrderData }
+  | { type: 'LOAD_CART'; items: CartItem[]; lastOrder: OrderData | null };
 
 interface CartContextType extends CartState {
   addItem: (item: Omit<CartItem, 'quantity'>) => void;
@@ -129,6 +133,13 @@ function cartReducer(state: CartState, action: CartAction): CartState {
         lastOrder: action.order,
       };
     
+    case 'LOAD_CART':
+      return {
+        ...state,
+        items: action.items,
+        lastOrder: action.lastOrder,
+      };
+    
     default:
       return state;
   }
@@ -140,6 +151,53 @@ export function CartProvider({ children }: { children: ReactNode }) {
     isOpen: false,
     lastOrder: null,
   });
+
+  // Load cart from localStorage on mount
+  useEffect(() => {
+    try {
+      const savedCart = localStorage.getItem(CART_STORAGE_KEY);
+      const savedOrder = localStorage.getItem(ORDER_STORAGE_KEY);
+      
+      if (savedCart || savedOrder) {
+        const items = savedCart ? JSON.parse(savedCart) : [];
+        const lastOrder = savedOrder ? JSON.parse(savedOrder) : null;
+        
+        dispatch({
+          type: 'LOAD_CART',
+          items,
+          lastOrder,
+        });
+      }
+    } catch (error) {
+      console.error('Failed to load cart from localStorage:', error);
+    }
+  }, []);
+
+  // Save cart to localStorage whenever items change
+  useEffect(() => {
+    try {
+      if (state.items.length > 0) {
+        localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(state.items));
+      } else {
+        localStorage.removeItem(CART_STORAGE_KEY);
+      }
+    } catch (error) {
+      console.error('Failed to save cart to localStorage:', error);
+    }
+  }, [state.items]);
+
+  // Save last order to localStorage whenever it changes
+  useEffect(() => {
+    try {
+      if (state.lastOrder) {
+        localStorage.setItem(ORDER_STORAGE_KEY, JSON.stringify(state.lastOrder));
+      } else {
+        localStorage.removeItem(ORDER_STORAGE_KEY);
+      }
+    } catch (error) {
+      console.error('Failed to save order to localStorage:', error);
+    }
+  }, [state.lastOrder]);
 
   const addItem = (item: Omit<CartItem, 'quantity'>) => {
     dispatch({
