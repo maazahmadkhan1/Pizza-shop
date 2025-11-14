@@ -121,6 +121,24 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     console.log('Display Name:', userCredential.user.displayName);
     console.log('Email:', userCredential.user.email);
     
+    // Check if Square customer exists, create if not
+    try {
+      const existingCustomer = await getSquareCustomer(userCredential.user.uid);
+      
+      if (!existingCustomer && userCredential.user.email) {
+        console.log('No Square customer found, creating one...');
+        await createSquareUser(
+          userCredential.user.uid,
+          userCredential.user.displayName || userCredential.user.email.split('@')[0],
+          userCredential.user.email
+        );
+        console.log('Square customer created for Google user');
+      }
+    } catch (error) {
+      console.error('Error ensuring Square customer for Google user:', error);
+      return { squareError: 'Payment system setup incomplete. You can still use the app, but may need to retry before checkout.' };
+    }
+    
     return {};
   }
 
