@@ -11,7 +11,10 @@ function getSquareClient() {
     throw new Error("Square credentials not configured");
   }
 
-  const isSandbox = process.env.SQUARE_ACCESS_TOKEN.startsWith('EAAAE');
+  const isSandbox = process.env.VITE_SQUARE_APPLICATION_ID?.startsWith('sandbox-');
+  console.log('Square Environment Detection:');
+  console.log('- Application ID starts with "sandbox-":', isSandbox);
+  console.log('- Using environment:', isSandbox ? 'Sandbox' : 'Production');
   
   return new SquareClient({
     token: process.env.SQUARE_ACCESS_TOKEN,
