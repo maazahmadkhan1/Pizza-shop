@@ -424,8 +424,40 @@ export default function Checkout() {
                           setPaymentId(id);
                           toast({
                             title: 'Payment Successful',
-                            description: 'Your payment has been processed successfully',
+                            description: 'Redirecting to order confirmation...',
                           });
+                          
+                          // Automatically complete order after successful payment
+                          setTimeout(() => {
+                            const orderData = {
+                              orderNumber: generateOrderNumber(),
+                              items: [...items],
+                              subtotal,
+                              deliveryFee,
+                              total,
+                              deliveryMethod,
+                              paymentMethod: 'card' as PaymentMethod,
+                              timestamp: new Date(),
+                              ...(deliveryMethod === 'delivery' 
+                                ? { deliveryAddress: { ...deliveryAddress } }
+                                : { 
+                                    pickupLocation: storeLocations.find(loc => loc.id === selectedLocation) 
+                                      ? {
+                                          id: selectedLocation,
+                                          name: storeLocations.find(loc => loc.id === selectedLocation)!.name,
+                                          address: storeLocations.find(loc => loc.id === selectedLocation)!.address,
+                                        }
+                                      : undefined
+                                  }
+                              ),
+                            };
+                            
+                            console.log('✅ Order Data After Payment:', orderData);
+                            
+                            setLastOrder(orderData);
+                            clearCart();
+                            setLocation('/order-confirmation');
+                          }, 1000);
                         }}
                         onPaymentError={(error) => {
                           setPaymentId(null);
