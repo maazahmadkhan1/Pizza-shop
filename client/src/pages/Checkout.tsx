@@ -1,5 +1,7 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useCart } from '@/hooks/use-cart';
+import { useAuth } from '@/contexts/AuthContext';
+import { getSquareCustomer } from '@/lib/squareUser';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -49,12 +51,14 @@ const storeLocations: Location[] = [
 
 export default function Checkout() {
   const { items, subtotal, clearCart, setLastOrder } = useCart();
+  const { currentUser } = useAuth();
   const { toast } = useToast();
   const [, setLocation] = useLocation();
 
   const [deliveryMethod, setDeliveryMethod] = useState<DeliveryMethod>('pickup');
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('cash');
   const [selectedLocation, setSelectedLocation] = useState<string>('');
+  const [squareCustomerId, setSquareCustomerId] = useState<string | null>(null);
   
   const [deliveryAddress, setDeliveryAddress] = useState({
     street: '',
@@ -66,6 +70,23 @@ export default function Checkout() {
   const [cardNumber, setCardNumber] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [paymentId, setPaymentId] = useState<string | null>(null);
+
+  // Fetch Square customer ID when component mounts
+  useEffect(() => {
+    async function fetchSquareCustomer() {
+      if (currentUser?.uid) {
+        try {
+          const customerData = await getSquareCustomer(currentUser.uid);
+          if (customerData?.squareCustomerId) {
+            setSquareCustomerId(customerData.squareCustomerId);
+          }
+        } catch (error) {
+          console.error('Error fetching Square customer:', error);
+        }
+      }
+    }
+    fetchSquareCustomer();
+  }, [currentUser]);
 
   const deliveryFee = deliveryMethod === 'delivery' ? 5.99 : 0;
   const total = subtotal + deliveryFee;
@@ -113,8 +134,17 @@ export default function Checkout() {
     }
 
     setTimeout(() => {
+      // Customer information
+      const customerInfo = {
+        uid: currentUser?.uid || null,
+        name: currentUser?.displayName || null,
+        email: currentUser?.email || null,
+        squareCustomerId: squareCustomerId || null,
+      };
+
       const orderData = {
         orderNumber: generateOrderNumber(),
+        customer: customerInfo,
         items: [...items],
         subtotal,
         deliveryFee,
@@ -450,8 +480,17 @@ export default function Checkout() {
                           
                           // Automatically complete order after successful payment
                           setTimeout(() => {
+                            // Customer information
+                            const customerInfo = {
+                              uid: currentUser?.uid || null,
+                              name: currentUser?.displayName || null,
+                              email: currentUser?.email || null,
+                              squareCustomerId: squareCustomerId || null,
+                            };
+
                             const orderData = {
                               orderNumber: generateOrderNumber(),
+                              customer: customerInfo,
                               items: [...items],
                               subtotal,
                               deliveryFee,
@@ -473,7 +512,7 @@ export default function Checkout() {
                               ),
                             };
                             
-                            console.log('✅ Order Data After Payment:', orderData);
+                            console.log('💳 CARD ORDER DATA (After Payment):', orderData);
                             
                             setLastOrder(orderData);
                             clearCart();
