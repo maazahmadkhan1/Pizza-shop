@@ -36,7 +36,16 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createSquareCustomer(insertCustomer: InsertSquareCustomer): Promise<SquareCustomer> {
-    const result = await db.insert(squareCustomers).values(insertCustomer).returning();
+    if (!insertCustomer.squareCustomerId) {
+      throw new Error("squareCustomerId is required");
+    }
+    
+    const result = await db.insert(squareCustomers).values({
+      firebaseUid: insertCustomer.firebaseUid,
+      squareCustomerId: insertCustomer.squareCustomerId,
+      email: insertCustomer.email,
+      name: insertCustomer.name,
+    }).returning();
     return result[0];
   }
 }

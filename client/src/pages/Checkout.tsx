@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useCart } from '@/hooks/use-cart';
 import { useAuth } from '@/contexts/AuthContext';
-import { getSquareCustomer } from '@/lib/squareUser';
+import { getSquareCustomer, createSquareUser } from '@/lib/squareUser';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -74,14 +74,23 @@ export default function Checkout() {
   // Fetch Square customer ID when component mounts
   useEffect(() => {
     async function fetchSquareCustomer() {
-      if (currentUser?.uid) {
+      if (currentUser?.uid && currentUser?.email) {
         try {
-          const customerData = await getSquareCustomer(currentUser.uid);
-          if (customerData?.squareCustomerId) {
+          let customerData = await getSquareCustomer(currentUser.uid);
+          
+          if (!customerData) {
+            console.log('No Square customer found, creating one...');
+            const newCustomerId = await createSquareUser(
+              currentUser.uid,
+              currentUser.displayName || currentUser.email.split('@')[0],
+              currentUser.email
+            );
+            setSquareCustomerId(newCustomerId);
+          } else if (customerData?.squareCustomerId) {
             setSquareCustomerId(customerData.squareCustomerId);
           }
         } catch (error) {
-          console.error('Error fetching Square customer:', error);
+          console.error('Error fetching/creating Square customer:', error);
         }
       }
     }
