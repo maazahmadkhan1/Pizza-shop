@@ -1,0 +1,68 @@
+GET https://4f599c70-16fd-403f-9895-04f3af62f5c0-00-pif02hqesyd7.janeway.replit.dev/api/square-customer/XvLHER3k9UYyT7x4NffJcPqbS2z1 500 (Internal Server Error)
+s.fetch @ requests.js:1
+(anonymous) @ traffic.js:1
+fetch @ traffic.js:1
+getSquareCustomer @ squareUser.ts:26
+fetchSquareCustomer @ Checkout.tsx:80
+(anonymous) @ Checkout.tsx:98
+commitHookEffectListMount @ chunk-WERSD76P.js?v=8fe8761d:16915
+commitPassiveMountOnFiber @ chunk-WERSD76P.js?v=8fe8761d:18156
+commitPassiveMountEffects_complete @ chunk-WERSD76P.js?v=8fe8761d:18129
+commitPassiveMountEffects_begin @ chunk-WERSD76P.js?v=8fe8761d:18119
+commitPassiveMountEffects @ chunk-WERSD76P.js?v=8fe8761d:18109
+flushPassiveEffectsImpl @ chunk-WERSD76P.js?v=8fe8761d:19490
+flushPassiveEffects @ chunk-WERSD76P.js?v=8fe8761d:19447
+performSyncWorkOnRoot @ chunk-WERSD76P.js?v=8fe8761d:18868
+flushSyncCallbacks @ chunk-WERSD76P.js?v=8fe8761d:9119
+commitRootImpl @ chunk-WERSD76P.js?v=8fe8761d:19432
+commitRoot @ chunk-WERSD76P.js?v=8fe8761d:19277
+finishConcurrentRender @ chunk-WERSD76P.js?v=8fe8761d:18805
+performConcurrentWorkOnRoot @ chunk-WERSD76P.js?v=8fe8761d:18718
+workLoop @ chunk-WERSD76P.js?v=8fe8761d:197
+flushWork @ chunk-WERSD76P.js?v=8fe8761d:176
+performWorkUntilDeadline @ chunk-WERSD76P.js?v=8fe8761d:384Understand this error
+squareUser.ts:39 Error fetching Square customer: Error: Failed to fetch Square customer: 500 {"error":"Failed to fetch customer"}
+    at getSquareCustomer (squareUser.ts:34:13)
+    at async fetchSquareCustomer (Checkout.tsx:80:30)
+getSquareCustomer @ squareUser.ts:39
+await in getSquareCustomer
+fetchSquareCustomer @ Checkout.tsx:80
+(anonymous) @ Checkout.tsx:98
+commitHookEffectListMount @ chunk-WERSD76P.js?v=8fe8761d:16915
+commitPassiveMountOnFiber @ chunk-WERSD76P.js?v=8fe8761d:18156
+commitPassiveMountEffects_complete @ chunk-WERSD76P.js?v=8fe8761d:18129
+commitPassiveMountEffects_begin @ chunk-WERSD76P.js?v=8fe8761d:18119
+commitPassiveMountEffects @ chunk-WERSD76P.js?v=8fe8761d:18109
+flushPassiveEffectsImpl @ chunk-WERSD76P.js?v=8fe8761d:19490
+flushPassiveEffects @ chunk-WERSD76P.js?v=8fe8761d:19447
+performSyncWorkOnRoot @ chunk-WERSD76P.js?v=8fe8761d:18868
+flushSyncCallbacks @ chunk-WERSD76P.js?v=8fe8761d:9119
+commitRootImpl @ chunk-WERSD76P.js?v=8fe8761d:19432
+commitRoot @ chunk-WERSD76P.js?v=8fe8761d:19277
+finishConcurrentRender @ chunk-WERSD76P.js?v=8fe8761d:18805
+performConcurrentWorkOnRoot @ chunk-WERSD76P.js?v=8fe8761d:18718
+workLoop @ chunk-WERSD76P.js?v=8fe8761d:197
+flushWork @ chunk-WERSD76P.js?v=8fe8761d:176
+performWorkUntilDeadline @ chunk-WERSD76P.js?v=8fe8761d:384Understand this error
+Checkout.tsx:94 Error fetching/creating Square customer: Error: Failed to fetch Square customer: 500 {"error":"Failed to fetch customer"}
+    at getSquareCustomer (squareUser.ts:34:13)
+    at async fetchSquareCustomer (Checkout.tsx:80:30)
+fetchSquareCustomer @ Checkout.tsx:94
+await in fetchSquareCustomer
+(anonymous) @ Checkout.tsx:98
+commitHookEffectListMount @ chunk-WERSD76P.js?v=8fe8761d:16915
+commitPassiveMountOnFiber @ chunk-WERSD76P.js?v=8fe8761d:18156
+commitPassiveMountEffects_complete @ chunk-WERSD76P.js?v=8fe8761d:18129
+commitPassiveMountEffects_begin @ chunk-WERSD76P.js?v=8fe8761d:18119
+commitPassiveMountEffects @ chunk-WERSD76P.js?v=8fe8761d:18109
+flushPassiveEffectsImpl @ chunk-WERSD76P.js?v=8fe8761d:19490
+flushPassiveEffects @ chunk-WERSD76P.js?v=8fe8761d:19447
+performSyncWorkOnRoot @ chunk-WERSD76P.js?v=8fe8761d:18868
+flushSyncCallbacks @ chunk-WERSD76P.js?v=8fe8761d:9119
+commitRootImpl @ chunk-WERSD76P.js?v=8fe8761d:19432
+commitRoot @ chunk-WERSD76P.js?v=8fe8761d:19277
+finishConcurrentRender @ chunk-WERSD76P.js?v=8fe8761d:18805
+performConcurrentWorkOnRoot @ chunk-WERSD76P.js?v=8fe8761d:18718
+workLoop @ chunk-WERSD76P.js?v=8fe8761d:197
+flushWork @ chunk-WERSD76P.js?v=8fe8761d:176
+performWorkUntilDeadline @ chunk-WERSD76P.js?v=8fe8761d:384Understand this error
