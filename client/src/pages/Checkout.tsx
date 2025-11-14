@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useCart } from '@/hooks/use-cart';
 import { useAuth } from '@/contexts/AuthContext';
 import { getSquareCustomer, createSquareUser } from '@/lib/squareUser';
+import { createSquareInvoice } from '@/lib/squareInvoice';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -205,34 +206,17 @@ export default function Checkout() {
             total: orderData.total
           };
 
-          console.log('📄 Creating Square Invoice for Cash Order:', invoicePayload);
-
-          const createOrderUrl = import.meta.env.VITE_CREATE_SQUARE_ORDER_URL || 'https://createsquareorder-wuv7qzdnyq-uc.a.run.app';
-          const invoiceResponse = await fetch(createOrderUrl, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(invoicePayload),
+          await createSquareInvoice(invoicePayload);
+          
+          toast({
+            title: 'Order Placed',
+            description: 'Square invoice created successfully. You can pay when you receive your order.',
           });
-
-          if (!invoiceResponse.ok) {
-            const errorText = await invoiceResponse.text();
-            console.error('❌ Failed to create Square invoice:', errorText);
-            toast({
-              title: 'Warning',
-              description: 'Order placed but invoice creation failed. Please contact support.',
-              variant: 'destructive',
-            });
-          } else {
-            const invoiceData = await invoiceResponse.json();
-            console.log('✅ Square Invoice Created:', invoiceData);
-          }
         } catch (error) {
           console.error('❌ Error creating Square invoice:', error);
           toast({
             title: 'Warning',
-            description: 'Order placed but invoice creation encountered an error.',
+            description: 'Order placed but invoice creation encountered an error. Please contact support.',
             variant: 'destructive',
           });
         }

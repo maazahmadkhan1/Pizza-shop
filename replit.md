@@ -133,10 +133,19 @@ Preferred communication style: Simple, everyday language.
 - **Square API** (`square` package): Server-side payment creation and verification
 - Payment component in `client/src/components/SquarePaymentForm.tsx`
 - Server-side payment endpoint at `/api/square-payment` with authoritative pricing validation
+- **Square Invoice Creation for Cash Orders**: Firebase Cloud Function integration
+  - Automatically creates Square invoices for cash orders (Cash on Delivery/Cash at Pickup)
+  - Endpoint: `https://createsquareorder-wuv7qzdnyq-uc.a.run.app`
+  - Utility function: `client/src/lib/squareInvoice.ts`
+  - Configurable via `VITE_CREATE_SQUARE_ORDER_URL` environment variable
+  - Delivery fee: $5.99 for delivery, $0 for pickup
+  - Comprehensive error handling and user notifications
+  - See `docs/square-invoice-integration.md` for detailed documentation
 - **Required Environment Variables**:
   - `VITE_SQUARE_APPLICATION_ID`: Square Application ID (client-side)
   - `VITE_SQUARE_LOCATION_ID`: Square Location ID (client-side)
   - `SQUARE_ACCESS_TOKEN`: Square Access Token (server-side only, starts with "sandbox-" for testing or "sq0atp-" for production)
+  - `VITE_CREATE_SQUARE_ORDER_URL`: (Optional) Firebase Cloud Function URL for invoice creation
 - **Security implementation**:
   - Server fetches authoritative product catalog from Firebase Cloud Function
   - Client sends only variation IDs and quantities (no prices)
@@ -145,7 +154,7 @@ Preferred communication style: Simple, everyday language.
   - Delivery fee calculated server-side (599 cents = $5.99)
   - Total validated > 0 before charging
   - Square receives amount in cents (required format)
-- **Payment Flow**:
+- **Payment Flow for Card Payments**:
   1. User selects "Credit/Debit Card" payment method on checkout page
   2. Square payment form appears with card input fields (powered by Square Web Payments SDK)
   3. User enters card details (tokenized by Square, never touches our server)
@@ -156,6 +165,14 @@ Preferred communication style: Simple, everyday language.
   8. Payment success/failure is communicated back to the checkout page
   9. If successful, "Confirm Order" button becomes enabled
   10. User clicks "Confirm Order" to complete the checkout process
+- **Payment Flow for Cash Orders**:
+  1. User selects "Cash on Delivery" or "Cash at Pickup" payment method
+  2. User fills in required delivery/pickup information
+  3. User clicks "Place Order"
+  4. System automatically calls Firebase Cloud Function to create Square invoice
+  5. Square invoice/order is created with customer details and line items
+  6. User receives confirmation and can pay upon delivery/pickup
+  7. Toast notification confirms successful invoice creation
 
 **Form Handling**
 - **React Hook Form**: Form state management
