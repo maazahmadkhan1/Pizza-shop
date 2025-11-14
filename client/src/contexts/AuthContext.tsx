@@ -90,30 +90,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     } catch (error) {
       console.error('Error calling loginUser function:', error);
     }
-    
-    // Try to reconcile Square customer if missing (recovery mechanism)
-    try {
-      const existingCustomer = await getSquareCustomer(userCredential.user.uid);
-      
-      if (!existingCustomer && userCredential.user.email) {
-        console.log('Square customer missing, attempting to create during login...');
-        
-        const userName = userCredential.user.displayName || 
-                        (userCredential.user.email ? userCredential.user.email.split('@')[0] : 'Customer');
-        
-        await createSquareUser(
-          userCredential.user.uid,
-          userName,
-          userCredential.user.email
-        );
-        
-        console.log('Square customer created during login recovery');
-      } else if (!existingCustomer && !userCredential.user.email) {
-        console.warn('Cannot create Square customer: no email available for user', userCredential.user.uid);
-      }
-    } catch (error) {
-      console.error('Error reconciling Square customer during login:', error);
-    }
   }
 
   async function loginWithGoogle(): Promise<{ squareError?: string }> {
@@ -144,35 +120,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     console.log('UUID:', userCredential.user.uid);
     console.log('Display Name:', userCredential.user.displayName);
     console.log('Email:', userCredential.user.email);
-
-    // Check if Square customer already exists
-    let existingCustomer;
-    try {
-      existingCustomer = await getSquareCustomer(userCredential.user.uid);
-    } catch (error) {
-      console.error('Error fetching existing Square customer:', error);
-    }
     
-    if (!existingCustomer) {
-      // Try to create Square customer for new Google sign-up
-      // Backend handles both Square creation and database storage
-      try {
-        const squareCustomerId = await createSquareUser(
-          userCredential.user.uid,
-          userCredential.user.displayName || 'User',
-          userCredential.user.email || ''
-        );
-        
-        console.log('Square customer created and saved for Google user:', squareCustomerId);
-        return {};
-      } catch (error: any) {
-        console.error('Error creating Square customer for Google user:', error);
-        return { squareError: 'Payment system setup incomplete. You can still use the app, but may need to sign in again before checkout.' };
-      }
-    } else {
-      console.log('Existing Square customer found:', existingCustomer.squareCustomerId);
-      return {};
-    }
+    return {};
   }
 
   async function logout() {
