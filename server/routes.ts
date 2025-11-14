@@ -11,11 +11,11 @@ function getSquareClient() {
     throw new Error("Square credentials not configured");
   }
 
+  const isSandbox = process.env.SQUARE_ACCESS_TOKEN.startsWith('EAAAE');
+  
   return new SquareClient({
     token: process.env.SQUARE_ACCESS_TOKEN,
-    environment: process.env.SQUARE_ACCESS_TOKEN.startsWith('sandbox-') 
-      ? SquareEnvironment.Sandbox 
-      : SquareEnvironment.Production,
+    environment: isSandbox ? SquareEnvironment.Sandbox : SquareEnvironment.Production,
   });
 }
 
