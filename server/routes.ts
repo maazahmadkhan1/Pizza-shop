@@ -161,6 +161,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const validatedData = paymentRequestSchema.parse(req.body);
       const { sourceId, items, deliveryMethod, firebaseUid } = validatedData;
 
+      console.log('🔵 SERVER - Payment API Received Data:', {
+        deliveryMethod,
+        itemCount: items.length,
+        items,
+        hasFirebaseUid: !!firebaseUid,
+        firebaseUid
+      });
+
       // Fetch authoritative pricing from Firebase (NEVER trust client prices)
       const FIREBASE_PRODUCTS_URL = 'https://us-central1-pizza-shop-3afe9.cloudfunctions.net/getSquareProducts';
       let productsResponse;

@@ -136,6 +136,8 @@ export default function Checkout() {
         ),
       };
       
+      console.log('✅ Order Data Being Submitted:', orderData);
+      
       setLastOrder(orderData);
       clearCart();
       setIsSubmitting(false);
@@ -186,7 +188,10 @@ export default function Checkout() {
                 <CardContent>
                   <RadioGroup
                     value={deliveryMethod}
-                    onValueChange={(value) => setDeliveryMethod(value as DeliveryMethod)}
+                    onValueChange={(value) => {
+                      console.log('🚚 Delivery Method Changed:', value);
+                      setDeliveryMethod(value as DeliveryMethod);
+                    }}
                   >
                     <div className="flex items-start space-x-3 p-4 rounded-md border hover-elevate">
                       <RadioGroupItem value="pickup" id="pickup" data-testid="radio-pickup" />
@@ -231,7 +236,16 @@ export default function Checkout() {
                       </CardTitle>
                     </CardHeader>
                     <CardContent>
-                      <Select value={selectedLocation} onValueChange={setSelectedLocation}>
+                      <Select 
+                        value={selectedLocation} 
+                        onValueChange={(value) => {
+                          console.log('📍 Pickup Location Selected:', {
+                            locationId: value,
+                            locationDetails: storeLocations.find(loc => loc.id === value)
+                          });
+                          setSelectedLocation(value);
+                        }}
+                      >
                         <SelectTrigger data-testid="select-location">
                           <SelectValue placeholder="Choose a location" />
                         </SelectTrigger>
@@ -292,9 +306,11 @@ export default function Checkout() {
                           id="street"
                           placeholder="123 Main Street"
                           value={deliveryAddress.street}
-                          onChange={(e) =>
-                            setDeliveryAddress({ ...deliveryAddress, street: e.target.value })
-                          }
+                          onChange={(e) => {
+                            const updatedAddress = { ...deliveryAddress, street: e.target.value };
+                            console.log('📦 Delivery Address Updated:', updatedAddress);
+                            setDeliveryAddress(updatedAddress);
+                          }}
                           data-testid="input-street"
                         />
                       </div>
@@ -306,9 +322,11 @@ export default function Checkout() {
                             id="city"
                             placeholder="Toronto"
                             value={deliveryAddress.city}
-                            onChange={(e) =>
-                              setDeliveryAddress({ ...deliveryAddress, city: e.target.value })
-                            }
+                            onChange={(e) => {
+                              const updatedAddress = { ...deliveryAddress, city: e.target.value };
+                              console.log('📦 Delivery Address Updated:', updatedAddress);
+                              setDeliveryAddress(updatedAddress);
+                            }}
                             data-testid="input-city"
                           />
                         </div>
@@ -318,9 +336,11 @@ export default function Checkout() {
                             id="zip"
                             placeholder="M5H 2N2"
                             value={deliveryAddress.zip}
-                            onChange={(e) =>
-                              setDeliveryAddress({ ...deliveryAddress, zip: e.target.value })
-                            }
+                            onChange={(e) => {
+                              const updatedAddress = { ...deliveryAddress, zip: e.target.value };
+                              console.log('📦 Delivery Address Updated:', updatedAddress);
+                              setDeliveryAddress(updatedAddress);
+                            }}
                             data-testid="input-zip"
                           />
                         </div>
@@ -333,9 +353,11 @@ export default function Checkout() {
                           type="tel"
                           placeholder="(416) 555-0100"
                           value={deliveryAddress.phone}
-                          onChange={(e) =>
-                            setDeliveryAddress({ ...deliveryAddress, phone: e.target.value })
-                          }
+                          onChange={(e) => {
+                            const updatedAddress = { ...deliveryAddress, phone: e.target.value };
+                            console.log('📦 Delivery Address Updated:', updatedAddress);
+                            setDeliveryAddress(updatedAddress);
+                          }}
                           data-testid="input-phone"
                         />
                       </div>

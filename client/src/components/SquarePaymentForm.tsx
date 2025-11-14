@@ -47,20 +47,24 @@ export default function SquarePaymentForm({
 
   const handleCardTokenizeResponse = async (token: TokenResult) => {
     try {
+      const paymentData = {
+        sourceId: token.token,
+        items: items.map(item => ({
+          id: item.id,
+          quantity: item.quantity,
+        })),
+        deliveryMethod,
+        firebaseUid: currentUser?.uid,
+      };
+      
+      console.log('💳 Payment Data Being Sent to API:', paymentData);
+      
       const response = await fetch('/api/square-payment', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          sourceId: token.token,
-          items: items.map(item => ({
-            id: item.id,
-            quantity: item.quantity,
-          })),
-          deliveryMethod,
-          firebaseUid: currentUser?.uid,
-        }),
+        body: JSON.stringify(paymentData),
       });
 
       if (!response.ok) {
