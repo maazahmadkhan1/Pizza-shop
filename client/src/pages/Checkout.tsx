@@ -142,7 +142,7 @@ export default function Checkout() {
       return;
     }
 
-    setTimeout(() => {
+    setTimeout(async () => {
       // Customer information
       const customerInfo = {
         uid: currentUser?.uid || null,
@@ -175,25 +175,67 @@ export default function Checkout() {
         ),
       };
       
-      // Log cash orders (without payment) for Firebase function development
+      // Create Square invoice for cash orders
       if (paymentMethod === 'cash') {
-        console.log('💰 CASH ORDER DATA (For Firebase Function):', {
-          ...orderData,
-          orderType: deliveryMethod === 'delivery' ? 'Cash on Delivery' : 'Cash at Pickup',
-          itemDetails: orderData.items.map(item => ({
-            id: item.id,
-            name: item.name,
-            size: item.size,
-            quantity: item.quantity,
-            price: item.price,
-            total: item.price * item.quantity
-          })),
-          pricing: {
+        try {
+          const invoicePayload = {
+            orderNumber: orderData.orderNumber,
+            timestamp: orderData.timestamp.toString(),
+            paymentMethod: orderData.paymentMethod,
+            deliveryMethod: orderData.deliveryMethod,
+            customer: {
+              name: customerInfo.name || 'Guest',
+              email: customerInfo.email || '',
+              uid: customerInfo.uid || '',
+              squareCustomerId: customerInfo.squareCustomerId || ''
+            },
+            deliveryAddress: deliveryMethod === 'delivery' 
+              ? deliveryAddress 
+              : { street: '', city: '', zip: '', phone: '' },
+            items: orderData.items.map(item => ({
+              id: item.id,
+              name: item.name,
+              description: item.description || '',
+              image: item.image || '',
+              price: item.price,
+              quantity: item.quantity
+            })),
             subtotal: orderData.subtotal,
             deliveryFee: orderData.deliveryFee,
             total: orderData.total
+          };
+
+          console.log('📄 Creating Square Invoice for Cash Order:', invoicePayload);
+
+          const createOrderUrl = import.meta.env.VITE_CREATE_SQUARE_ORDER_URL || 'https://createsquareorder-wuv7qzdnyq-uc.a.run.app';
+          const invoiceResponse = await fetch(createOrderUrl, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(invoicePayload),
+          });
+
+          if (!invoiceResponse.ok) {
+            const errorText = await invoiceResponse.text();
+            console.error('❌ Failed to create Square invoice:', errorText);
+            toast({
+              title: 'Warning',
+              description: 'Order placed but invoice creation failed. Please contact support.',
+              variant: 'destructive',
+            });
+          } else {
+            const invoiceData = await invoiceResponse.json();
+            console.log('✅ Square Invoice Created:', invoiceData);
           }
-        });
+        } catch (error) {
+          console.error('❌ Error creating Square invoice:', error);
+          toast({
+            title: 'Warning',
+            description: 'Order placed but invoice creation encountered an error.',
+            variant: 'destructive',
+          });
+        }
       }
       
       console.log('✅ Order Data Being Submitted:', orderData);
