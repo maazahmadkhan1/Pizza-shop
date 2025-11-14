@@ -85,9 +85,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/square-customer/:firebaseUid", async (req, res) => {
     try {
       const { firebaseUid } = req.params;
-      const customer = await storage.getSquareCustomerByFirebaseUid(firebaseUid);
+      let customer = await storage.getSquareCustomerByFirebaseUid(firebaseUid);
       
       if (!customer) {
+        console.log(`Customer not found in local storage for Firebase UID: ${firebaseUid}`);
         return res.status(404).json({ error: "Customer not found" });
       }
       
