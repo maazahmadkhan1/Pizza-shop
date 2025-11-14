@@ -239,76 +239,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         try {
           const customer = await storage.getSquareCustomerByFirebaseUid(firebaseUid);
           customerId = customer?.squareCustomerId;
-          console.log(`✅ Found Square customer ID: ${customerId}`);
         } catch (error) {
           console.log("Could not find Square customer ID, will create on-demand:", error);
         }
       }
 
-      // Build line items for Square Order
-      const lineItems = [];
-      for (const item of items) {
-        // Find the variation across all products
-        let foundVariation = null;
-        let foundProduct = null;
-        
-        for (const product of products) {
-          const variation = product.variations.find((v: any) => v.id === item.id);
-          if (variation) {
-            foundVariation = variation;
-            foundProduct = product;
-            break;
-          }
-        }
-        
-        if (foundVariation && foundProduct) {
-          const priceInCents = Math.round(foundVariation.price * 100);
-          lineItems.push({
-            name: `${foundProduct.name} - ${foundVariation.name}`,
-            quantity: String(item.quantity),
-            basePriceMoney: {
-              amount: BigInt(priceInCents),
-              currency: 'USD',
-            },
-            ...(foundProduct.id && { catalogObjectId: foundProduct.id }),
-            ...(foundVariation.id && { catalogVersion: BigInt(0) }),
-          });
-        }
-      }
-
-      // Add delivery fee as a line item if applicable
-      if (deliveryFeeCents > 0) {
-        lineItems.push({
-          name: 'Delivery Fee',
-          quantity: '1',
-          basePriceMoney: {
-            amount: BigInt(deliveryFeeCents),
-            currency: 'USD',
-          },
-        });
-      }
-
-      console.log(`📦 Creating Square Order with ${lineItems.length} line items`);
-      console.log(`👤 Customer ID: ${customerId || 'Not provided'}`);
-
-      // Create Square Order with line items
-      const orderResponse = await squareClient.orders.create({
-        order: {
-          locationId: process.env.SQUARE_LOCATION_ID,
-          lineItems,
-          ...(customerId && { customerId }),
-        },
-        idempotencyKey: randomUUID(),
-      });
-
-      const orderId = orderResponse.order?.id;
-      if (!orderId) {
-        throw new Error("Failed to create Square order");
-      }
-
-      console.log(`✅ Square Order created: ${orderId}`);
-
-      // Create payment linked to the order
+      // Create payment
       const paymentResponse = await squareClient.payments.create({
         sourceId,
         amountMoney: {
@@ -316,17 +252,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
           currency: 'USD',
         },
         locationId: process.env.SQUARE_LOCATION_ID,
-        orderId,
         idempotencyKey: randomUUID(),
         ...(customerId && { customerId }),
       });
 
-      console.log(`✅ Payment created: ${paymentResponse.payment?.id}`);
-
       res.json({
         success: true,
         paymentId: paymentResponse.payment?.id,
-        orderId,
         status: paymentResponse.payment?.status,
         amount: amountInCents / 100, // Return amount in dollars for display
       });
