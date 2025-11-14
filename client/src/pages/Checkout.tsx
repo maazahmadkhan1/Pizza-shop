@@ -111,6 +111,17 @@ export default function Checkout() {
     e.preventDefault();
     setIsSubmitting(true);
 
+    // Require login for cash orders (needed for Square invoice creation)
+    if (paymentMethod === 'cash' && (!currentUser || !currentUser.email)) {
+      toast({
+        title: 'Login Required',
+        description: 'Please sign in to place cash orders. This is required to create your invoice.',
+        variant: 'destructive',
+      });
+      setIsSubmitting(false);
+      return;
+    }
+
     if (deliveryMethod === 'pickup' && !selectedLocation) {
       toast({
         title: 'Error',
@@ -479,6 +490,11 @@ export default function Checkout() {
                             : 'Pay with cash when you pick up your order'
                           }
                         </p>
+                        {!currentUser && (
+                          <p className="text-xs text-amber-600 dark:text-amber-500 mt-2">
+                            Note: Sign in required to place cash orders
+                          </p>
+                        )}
                       </Label>
                     </div>
 
